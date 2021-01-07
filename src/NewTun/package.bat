@@ -1,0 +1,1 @@
+pyinstaller -F -i favicon.ico zMain.spec
