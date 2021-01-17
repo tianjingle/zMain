@@ -3,6 +3,7 @@ import time
 
 import pymysql.cursors
 from src.NewTun.Connection import Connection
+from src.NewTun.JgdyQuery import JgdyQuery
 from src.NewTun.StockFetch import StockFetch
 
 
@@ -92,5 +93,7 @@ class StockInfoSyn:
                 print("syn  "+realCode)
                 fectExecute= StockFetch()
                 fectExecute.fetchByStartAndEndTime(realCode,startTime,endTime)
+            jgdy = JgdyQuery()
+            jgdy.printJgdyInfo(realCode.split('.')[1], 1)
         cursor.close()
         connect.close()

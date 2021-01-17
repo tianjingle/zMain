@@ -13,6 +13,7 @@ class Connection:
     sender=''
     receivers=''
 
+    jgdyUrl=''
     syn=False
     scans=2000
 
@@ -31,3 +32,4 @@ class Connection:
         self.charset = cf.get("Mysql-Database", "charset")  # 获取[Mysql-Database]中host对应的值
         self.syn=cf.get("System","syn")
         self.scans=cf.get("System","scans")
+        self.jgdyUrl=cf.get("Jgdy","fetchUrl")

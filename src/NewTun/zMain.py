@@ -5,6 +5,7 @@ import pymysql
 
 from src.NewTun.ApplicationWithDraw import ApplicationWithDraw
 from src.NewTun.Connection import Connection
+from src.NewTun.JgdyQuery import JgdyQuery
 from src.NewTun.QueryStock import QueryStock
 from src.NewTun.SendEmail import SendEmail
 from src.NewTun.Statistics import Statistics
@@ -75,6 +76,7 @@ class zMain:
                 data = (item[0], today)
                 cursor.execute(sql % data)
                 if len(list(cursor)) == 0:
+                    print(item)
                     sql = "INSERT INTO candidate_stock (id, code, name,collect_date,industry,grad,cv,is_down_line) VALUES ( '%s', '%s','%s', '%s','%s', %.8f, %.8f,%i)"
                     data = (uuid.uuid1(), item[0], item[1],today,item[3],test.avgCostGrad,test.cvValue,test.isDownLine)
                     cursor.execute(sql % data)
@@ -103,15 +105,15 @@ zm=zMain()
 sendEmail=SendEmail()
 s=Statistics()
 #同步历史数据
-# zm.synHistoryStock()
+zm.synHistoryStock()
 # #扫描选股
 # zm.scanStock()
 # #股票排名
-# zm.sortByStockGrad()
+zm.sortByStockGrad()
 # #作图
-# zm.stockShow()
+zm.stockShow()
 #统计股票盈利情况
-# s.fetchStocks()
+s.fetchStocks()
 # 分类股票推荐发送
 sendEmail.sendYouCanBuy(zm.currentPath)
 
