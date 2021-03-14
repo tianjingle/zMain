@@ -9,6 +9,9 @@ from src.NewTun.StockFetch import StockFetch
 
 class StockInfoSyn:
 
+    #是否拉取机构调研消息
+    isJgdy=False
+
     #tushare code转化为baostock code
     def tuShareCode2BaoStockCode(self,tuShareCode):
         code=tuShareCode.lower().split('.')
@@ -93,7 +96,8 @@ class StockInfoSyn:
                 print("syn  "+realCode)
                 fectExecute= StockFetch()
                 fectExecute.fetchByStartAndEndTime(realCode,startTime,endTime)
-            jgdy = JgdyQuery()
-            jgdy.printJgdyInfo(realCode.split('.')[1], 1)
+            if self.isJgdy=='True':
+                jgdy = JgdyQuery()
+                jgdy.printJgdyInfo(realCode.split('.')[1], 1)
         cursor.close()
         connect.close()

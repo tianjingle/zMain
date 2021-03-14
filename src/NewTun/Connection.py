@@ -15,6 +15,7 @@ class Connection:
 
     jgdyUrl=''
     syn=False
+    isJgdy=False
     scans=2000
 
     def __init__(self):
@@ -33,3 +34,4 @@ class Connection:
         self.syn=cf.get("System","syn")
         self.scans=cf.get("System","scans")
         self.jgdyUrl=cf.get("Jgdy","fetchUrl")
+        self.isJgdy=cf.get("Jgdy","isJgdy")

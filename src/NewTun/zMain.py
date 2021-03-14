@@ -5,7 +5,6 @@ import pymysql
 
 from src.NewTun.ApplicationWithDraw import ApplicationWithDraw
 from src.NewTun.Connection import Connection
-from src.NewTun.JgdyQuery import JgdyQuery
 from src.NewTun.QueryStock import QueryStock
 from src.NewTun.SendEmail import SendEmail
 from src.NewTun.Statistics import Statistics
@@ -31,6 +30,7 @@ class zMain:
             print("-----------------------------syn stock------------------------------------")
             print("start time:"+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
             syn=StockInfoSyn()
+            syn.isJgdy=self.connection.isJgdy
             syn.synStockInfo()
             print("start time:"+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
 
@@ -107,7 +107,7 @@ s=Statistics()
 #同步历史数据
 zm.synHistoryStock()
 # #扫描选股
-# zm.scanStock()
+zm.scanStock()
 # #股票排名
 zm.sortByStockGrad()
 # #作图
