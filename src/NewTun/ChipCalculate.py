@@ -53,7 +53,11 @@ class ChipCalculate:
                 close=float(line[4])
                 max=float(line[2])
                 min=float(line[3])
-                vol=float(line[5])
+                vol = 0
+                if line[5]== '':
+                    vol=0
+                else:
+                    vol=float(line[5])
                 avc_price=float(line[6])
                 if line[7]=='':
                     line[7]=0

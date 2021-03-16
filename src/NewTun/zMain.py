@@ -104,7 +104,7 @@ class zMain:
 zm=zMain()
 sendEmail=SendEmail()
 s=Statistics()
-#同步历史数据
+# #同步历史数据
 zm.synHistoryStock()
 # #扫描选股
 zm.scanStock()
