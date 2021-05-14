@@ -33,8 +33,8 @@ class SendEmail:
                 self.other.append(temp)
         self.tendown=sorted(self.tendown, key=lambda s: s[2],reverse=False)
         self.other=sorted(self.other, key=lambda s: s[2],reverse=False)
-        # self.doSendStockInfoBeautiful(self.tendown,currentPath,"平民股票")
-        # self.doSendStockInfoBeautiful(self.other,currentPath,"土豪股票")
+        self.doSendStockInfoBeautiful(self.tendown,currentPath,"平民股票")
+        self.doSendStockInfoBeautiful(self.other,currentPath,"土豪股票")
         self.doSendStatisticPaper()
 
 
