@@ -3,6 +3,8 @@
 
 整合baostack、tushare天天基金等数据源，筹码计算，多阶导数计算，k线绘制，智能选股和邮件提醒，机构调研数据获取等。
 
+![zMain效果图](src/NewTun/temp/sh.600059.png)
+
 # 设置数据库的sql_model
 ```sql
 set global sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -38,8 +40,11 @@ create table ajgdy (
 ```
 
 # pip依赖的库
+```sqlite
 Package                       Version
+
 ----------------------------- ----------
+
 -ip                           20.2.3
 alabaster                     0.7.12
 alembic                       1.4.3
@@ -141,13 +146,25 @@ websocket-client              0.57.0
 Werkzeug                      1.0.1
 wordcloud                     1.8.1
 
+```
+
+
+
 
 # 安装ta-lib的方法
 1. ta-lib不能直接用pip install ta-lib的方式进行安装，需要下载whl文件，然后pip install xxx.whl的方式进行安装
 2. 确认自己的python的版本，比如我本地安装的是python3.8
-3. 去python第三方库中下载和我们python匹配的ta-lib，其网址为https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib，因为我们的python是3.8，操作系统是64，所以我们下载cp38,64位
+3. 去[python第三方库](https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib)中下载和我们python匹配的ta-lib，因为我们的python是3.8，操作系统是64，所以我们下载cp38,64位
 4. 使用管理员权限运行cmd，执行命令：pip install "C:\Users\Administrator\Downloads\TA_Lib-0.4.20-cp38-cp38-win_amd64.whl"
 5. 安装完成
 
 # git 提交代码设置postbuffer大小
+```sqlite
+git pull
+git add .
+git commit -m '123'
+git pull
 git config http.postBuffer 524288000
+git push
+```
+
