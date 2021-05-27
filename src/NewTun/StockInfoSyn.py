@@ -69,7 +69,9 @@ class StockInfoSyn:
         cursor.execute(allStockBasic)
         startTime=''
         endTime=time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        isToady=False
         for row in cursor.fetchall():
+            isToady=False
             print(row[0])
             realCode=self.tuShareCode2BaoStockCode(row[0])
             tableCheckSql = "show tables like '"+realCode+"'"
@@ -86,12 +88,13 @@ class StockInfoSyn:
                 for row in cursor.fetchall():
                     startTime1=row[0]
                     if startTime1==endTime:
+                        isToady=True
                         continue
                     str_p = startTime1+' 0:29:08'
                     dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
                     startTime=(dateTime_p + datetime.timedelta(days=+1)).strftime("%Y-%m-%d")
-            if startTime==endTime:
-                print(realCode+"--不需要同步了。。")
+            if isToady==True:
+                print(realCode + "--不需要同步了。。")
             else:
                 print("syn  "+realCode)
                 fectExecute= StockFetch()
