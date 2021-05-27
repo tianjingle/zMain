@@ -29,7 +29,7 @@ class QueryStock:
         # 获取游标
         cursor = connect.cursor()
         # 查询数据
-        sql = "select * from (SELECT * FROM `"+stackCode+"` where tradestatus=1 and turn is not null order by date desc limit %i) as b order by date asc"
+        sql = "select * from (SELECT DISTINCT * FROM `"+stackCode+"` where tradestatus=1 and turn is not null order by date desc limit %i) as b order by date asc"
         data = (self.window+80)
         cursor.execute(sql % data)
         fs = cursor.description
