@@ -105,6 +105,19 @@ websocket-client 1.1.0
 4. 使用管理员权限运行cmd，执行命令：pip install "C:\Users\Administrator\Downloads\TA_Lib-0.4.20-cp38-cp38-win_amd64.whl"
 5. 安装完成
 
+
+# 首次启动
+首次启动的时候需要获取上海、深圳交易所所有的股票。然后填入我们的数据库,因为baoStock获取的数据比较差，这块用tushare，但是tushare需要填写一个token，您可能需要注册一下，然后替换掉我代码中的token即可。
+![所有股票入库](src/NewTun/temp/allStock.jpg)
+
+
+# 启动zMain
+
+![zMain效果图](src/NewTun/temp/runZmain.jpg)
+## 数据效果
+![查看拉取信息](src/NewTun/temp/fetchData.jpg)
+
+
 # git 提交代码设置postbuffer大小
 ```sqlite
 git pull
