@@ -39,6 +39,9 @@ create table ajgdy (
  ChangeP text,
  Close text);
 ```
+# python和pycharm的安装
+
+请参考：https://mp.weixin.qq.com/s/nESzVdsAzOZ3pwdLfVb6yA
 
 # pip基本依赖的库
 ```sqlite
