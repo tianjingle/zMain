@@ -53,6 +53,15 @@ baostock         0.8.8     #baoStock开源的股票历史数据库
 matplotlib       3.4.2     #python做图库
 scipy            1.6.3     #python科学计算库，线性回归等。
 ```
+
+# 安装办法
+
+```sqlite
+pip install numpy
+pip install panda
+。。。。等等等
+```
+
 # 全部依赖的库
 
 ```sqlite
@@ -96,8 +105,6 @@ urllib3          1.26.5
 websocket-client 1.1.0
 
 ```
-
-
 
 
 # 安装ta-lib的方法
