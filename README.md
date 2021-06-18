@@ -52,6 +52,7 @@ tushare          1.2.62    #tuShare股票历史数据库
 baostock         0.8.8     #baoStock开源的股票历史数据库
 matplotlib       3.4.2     #python做图库
 scipy            1.6.3     #python科学计算库，线性回归等。
+prettytable      2.1.0     #
 ```
 
 # 安装办法
@@ -67,6 +68,7 @@ pip install panda
 ```sqlite
 Package          Version
 ---------------- ---------
+prettytable      2.1.0
 scipy            1.6.3
 baostock         0.8.8
 beautifulsoup4   4.9.3
