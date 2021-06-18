@@ -42,21 +42,23 @@ create table ajgdy (
 
 # pip基本依赖的库
 ```sqlite
-numpy            1.20.3
-panda            0.3.1
-pandas           1.2.4
-PyMySQL          1.0.2
-pyparsing        2.4.7
-TA-Lib           0.4.20
-tushare          1.2.62
-baostock         0.8.8
-matplotlib       3.4.2
+numpy            1.20.3    #矩阵计算
+panda            0.3.1     #矩阵计算库
+pandas           1.2.4     #数学计算库
+PyMySQL          1.0.2     #python的mysql链接
+pyparsing        2.4.7     #python的sql翻译
+TA-Lib           0.4.20    #量化投资必备的指标计算库
+tushare          1.2.62    #tuShare股票历史数据库
+baostock         0.8.8     #baoStock开源的股票历史数据库
+matplotlib       3.4.2     #python做图库
+scipy            1.6.3     #python科学计算库，线性回归等。
 ```
 # 全部依赖的库
 
 ```sqlite
 Package          Version
 ---------------- ---------
+scipy            1.6.3
 baostock         0.8.8
 beautifulsoup4   4.9.3
 bs4              0.0.1
