@@ -40,8 +40,8 @@ create table ajgdy (
  Close text);
 ```
 
-# pip依赖的库
-
+# pip基本依赖的库
+```sqlite
 numpy            1.20.3
 panda            0.3.1
 pandas           1.2.4
@@ -51,6 +51,8 @@ TA-Lib           0.4.20
 tushare          1.2.62
 baostock         0.8.8
 matplotlib       3.4.2
+```
+# 全部依赖的库
 
 ```sqlite
 Package          Version
