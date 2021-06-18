@@ -132,6 +132,35 @@ https://tushare.pro/login
 ![查看拉取信息](src/NewTun/temp/fetchData.jpg)
 
 
+
+# 配置文件说明
+```sql
+[Mysql-Database]
+host=localhost   #数据库地址
+user=root      #账户
+passwd=tianjingle   #密码
+db=noun   #数据库名称，需要提前创建
+charset=utf8
+[Email]
+pass=tmugmrbimrcddead   #邮件密码，这是我申请的，您可以自己申请一个
+user=2695062879@qq.com   #邮件密码关联的用户邮箱
+sender=2695062879@qq.com   #发邮件的用户邮箱
+receiver=2695062879@qq.com   #接受人的邮箱，多人用，号隔开
+[System]
+syn=True    #是否获取历史股票数据
+scans=4000   #总计扫描多少只股票，中国股市大概有4080多只股票。
+[Jgdy]
+isJgdy=False   #是否获取机构调研的数据
+fetchUrl=http://datainterface3.eastmoney.com/EM_DataCenter_V3/api/JGDYHZ/GetJGDYMX?js=datatable435798&tkn=eastmoney&secuCode={0}&sortfield=4&sortdirec=1&pageNum={1}&pageSize={2}&cfg=jgdyhz&p=2&pageNo={3}&_=1610583145484  #机构调研数据接口
+
+```
+
+# 股票池
+
+```sql
+数据库中表candidate_stock为zMain筛选的股票的历史信息。
+```
+
 # git 提交代码设置postbuffer大小
 ```sqlite
 git pull
