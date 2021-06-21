@@ -110,7 +110,7 @@ s=Statistics()
 # #同步历史数据
 # zm.synHistoryStock()
 # #扫描选股
-zm.scanStock()
+# zm.scanStock()
 # #股票排名
 zm.sortByStockGrad()
 # #作图

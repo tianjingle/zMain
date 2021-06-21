@@ -160,6 +160,8 @@ class SendEmail:
             htmls=htmls+"</tr>"
         htmls=htmls+"</table>"
         totalCount=len(result)
+        if totalCount==0:
+            totalCount=1
         endHtml="增长个数:"+str(successCount)+"&nbsp&nbsp&nbsp&nbsp总共个数："+str(totalCount)+"                </br> 百分比："+str(successCount*100/totalCount)+"%"+htmls
         con = Connection()
         endDate = time.strftime('%Y-%m-%d', time.localtime(time.time()))
