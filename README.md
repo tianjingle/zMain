@@ -11,6 +11,29 @@
 set global sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+# 有时候您的电脑性能太强，数据库链接很快耗尽，这块可以设置数据库的最大连接数，往大的设置一下。
+set global max_connections=1000;
+
+#或者，我们可以在数据库的配置文件配置
+[client]
+# 设置mysql客户端默认字符集
+default-character-set=utf8
+ 
+ ------------------------------------------
+[mysqld]
+# 设置3306端口
+port = 3306
+# 设置mysql的安装目录
+basedir=D:\\mysql\\mysql-8.0.25-winx64
+# 设置 mysql数据库的数据的存放目录，MySQL 8+ 不需要以下配置，系统自己生成即可，否则有可能报错
+datadir=D:\\mysql\\mysql-8.0.25-winx64\\data
+# 允许最大连接数
+max_connections=1000
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB
 ```
 
 # 添加机构调研的库
