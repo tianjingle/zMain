@@ -34,6 +34,7 @@ class StockFetch:
         ##将数据写入mysql的数据库，但需要先通过sqlalchemy.create_engine建立连接,且字符编码设置为utf8，否则有些latin字符不能处理
         connection=Connection()
         connectionStr="mysql+pymysql://"+connection.user+":"+connection.passwd+"@"+connection.host+":"+str(connection.port)+"/"+connection.db+"?charset=utf8"
-        engine = create_engine(connectionStr,pool_size=25, pool_recycle=60)
+        engine = create_engine(connectionStr,pool_size=20, pool_recycle=60)
+
         # 插入数据库
         result.to_sql(name=code, con=engine, if_exists='append', index=False, index_label=False)
