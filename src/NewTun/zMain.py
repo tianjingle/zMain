@@ -62,7 +62,10 @@ class zMain:
         for item in basicStock:
             count = count + 1
             test = Application()
-            print(str(count) + "     " + item[0]+"     "+item[1]+"    "+item[2]+"    "+item[3])
+            if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None:
+                print(str(count) + "     " + item[0]+"     "+item[1]+"    "+item[2]+"    "+item[3])
+            else:
+                continue
             kk = test.execute(item[0])
             if test.avgCostGrad < 0:
                 candidateTemp = []
@@ -105,7 +108,7 @@ zm=zMain()
 sendEmail=SendEmail()
 s=Statistics()
 # #同步历史数据
-zm.synHistoryStock()
+# zm.synHistoryStock()
 # #扫描选股
 zm.scanStock()
 # #股票排名
