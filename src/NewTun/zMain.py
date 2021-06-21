@@ -81,7 +81,7 @@ class zMain:
                 if len(list(cursor)) == 0:
                     print(item)
                     sql = "INSERT INTO candidate_stock (id, code, name,collect_date,industry,grad,cv,is_down_line) VALUES ( '%s', '%s','%s', '%s','%s', %.8f, %.8f,%i)"
-                    data = (uuid.uuid1(), item[0], item[1],today,item[3],test.avgCostGrad,test.cvValue,test.isDownLine)
+                    data = (uuid.uuid1(), item[0], item[1],today,item[3],test.avgCostGrad,abs(test.cvValue),test.isDownLine)
                     cursor.execute(sql % data)
                 connect.commit()
             # 垃圾回收
@@ -108,9 +108,9 @@ zm=zMain()
 sendEmail=SendEmail()
 s=Statistics()
 # #同步历史数据
-# zm.synHistoryStock()
+zm.synHistoryStock()
 # #扫描选股
-# zm.scanStock()
+zm.scanStock()
 # #股票排名
 zm.sortByStockGrad()
 # #作图
