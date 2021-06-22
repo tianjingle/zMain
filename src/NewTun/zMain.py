@@ -27,6 +27,7 @@ class zMain:
             self.currentPath=self.connection.savePath
             if not os.path.exists(self.currentPath+"\\temp\\"):
                 os.makedirs(self.currentPath)
+        #设置一个默认的图片
         if not os.path.exists(self.currentPath+"\\temp\\zMain.png"):
             imgHeight=200
             imgWidth=500
@@ -42,7 +43,6 @@ class zMain:
             print('text location:', (textX0, textY0))
             print('text size (width,height):', letterWidth, letterHeight)
             print('img size(width,height):', imgSize)
-            # font = ImageFont.truetype('DIN1451.ttf', 20)
             font = ImageFont.truetype("C:\\Windows\\Fonts\\Arial.ttf", size=20)
             fg_color = (0, 0, 0)
             drawBrush.text((textX0, textY0), "---zMain---", fill=fg_color, font=font)
