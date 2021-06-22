@@ -20,6 +20,8 @@ class zMain:
     candidate=[]
     currentPath=''
     connection = None
+
+    #初始化函数
     def __init__(self):
         self.currentPath=os.getcwd()
         self.connection = Connection()
