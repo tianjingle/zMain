@@ -1,3 +1,4 @@
+import os
 import smtplib
 import time
 from email.mime.image import MIMEImage
@@ -70,12 +71,21 @@ class SendEmail:
         count = 80
         for item in codes:
             if count>0:
-                fp = open(currentPath+'\\temp\\' + item[0] + ".png", 'rb')
-                msgImage = MIMEImage(fp.read())
-                fp.close()
-                temp = "<" + item[0] + ">"
-                # 定义图片 ID，在 HTML 文本中引用
-                msgImage.add_header('Content-ID', temp)
+                pngPath=currentPath+'\\temp\\' + item[0] + ".png"
+                if os.path.exists(pngPath):
+                    fp = open(pngPath, 'rb')
+                    msgImage = MIMEImage(fp.read())
+                    fp.close()
+                    temp = "<" + item[0] + ">"
+                    # 定义图片 ID，在 HTML 文本中引用
+                    msgImage.add_header('Content-ID', temp)
+                else:
+                    fp = open(currentPath+"\\temp\\zMain.png", 'rb')
+                    msgImage = MIMEImage(fp.read())
+                    fp.close()
+                    temp = "<" + item[0] + ">"
+                    # 定义图片 ID，在 HTML 文本中引用
+                    msgImage.add_header('Content-ID', temp)
                 msgRoot.attach(msgImage)
             count=count-1
         try:

@@ -17,6 +17,7 @@ class Connection:
     syn=False
     isJgdy=False
     scans=2000
+    savePath=''
 
     def __init__(self):
         cf = configparser.ConfigParser()
@@ -35,3 +36,4 @@ class Connection:
         self.scans=cf.get("System","scans")
         self.jgdyUrl=cf.get("Jgdy","fetchUrl")
         self.isJgdy=cf.get("Jgdy","isJgdy")
+        self.savePath=cf.get("Path","savePath")

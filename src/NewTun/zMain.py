@@ -2,6 +2,7 @@ import time
 import os
 import uuid
 import pymysql
+from PIL import Image, ImageDraw, ImageFont
 
 from src.NewTun.ApplicationWithDraw import ApplicationWithDraw
 from src.NewTun.Connection import Connection
@@ -22,7 +23,30 @@ class zMain:
     def __init__(self):
         self.currentPath=os.getcwd()
         self.connection = Connection()
-
+        if self.connection.savePath!='':
+            self.currentPath=self.connection.savePath
+            if not os.path.exists(self.currentPath+"\\temp\\"):
+                os.makedirs(self.currentPath)
+        if not os.path.exists(self.currentPath+"\\temp\\zMain.png"):
+            imgHeight=200
+            imgWidth=500
+            letterHeight=10
+            letterWidth=50
+            imgSize = (imgWidth, imgHeight)
+            bg_color = (255, 255, 255)
+            img = Image.new("RGB", imgSize, bg_color)
+            drawBrush = ImageDraw.Draw(img)
+            textY0 = (imgHeight - letterHeight + 1) / 2
+            textY0 = int(textY0)
+            textX0 = int((imgWidth - letterWidth + 1) / 2)
+            print('text location:', (textX0, textY0))
+            print('text size (width,height):', letterWidth, letterHeight)
+            print('img size(width,height):', imgSize)
+            # font = ImageFont.truetype('DIN1451.ttf', 20)
+            font = ImageFont.truetype("C:\\Windows\\Fonts\\Arial.ttf", size=20)
+            fg_color = (0, 0, 0)
+            drawBrush.text((textX0, textY0), "---zMain---", fill=fg_color, font=font)
+            img.save(self.currentPath+"\\temp\\zMain.png",quality=100)
 
     #通过股票数据
     def synHistoryStock(self):
@@ -106,17 +130,17 @@ class zMain:
 
 zm=zMain()
 sendEmail=SendEmail()
-s=Statistics()
-# #同步历史数据
-zm.synHistoryStock()
-# #扫描选股
-zm.scanStock()
-# #股票排名
-zm.sortByStockGrad()
-# #作图
-zm.stockShow()
-#统计股票盈利情况
-s.fetchStocks()
+# s=Statistics()
+# # #同步历史数据
+# zm.synHistoryStock()
+# # #扫描选股
+# zm.scanStock()
+# # #股票排名
+# zm.sortByStockGrad()
+# # #作图
+# zm.stockShow()
+# #统计股票盈利情况
+# s.fetchStocks()
 # 分类股票推荐发送
 sendEmail.sendYouCanBuy(zm.currentPath)
 
