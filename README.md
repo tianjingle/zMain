@@ -157,7 +157,13 @@ https://tushare.pro/login
 ## 数据效果
 ![查看拉取信息](src/NewTun/temp/fetchData.jpg)
 
-
+# 股票池旧库添加字段
+```sql
+ALTER TABLE `noun`.`candidate_stock` 
+ADD COLUMN `zsm` INT NULL COMMENT '主力，散户，反转标志' AFTER `is_down_line`;
+ALTER TABLE `noun`.`candidate_stock` 
+CHANGE COLUMN `zsm` `zsm` INT NULL DEFAULT 0 COMMENT '主力，散户，反转标志' ;
+```
 
 # 配置文件说明
 ```sql

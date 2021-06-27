@@ -19,7 +19,10 @@ class Connection:
     scans=2000
     savePath=''
 
+    testCode=''
+
     def __init__(self):
+
         cf = configparser.ConfigParser()
         cf.read("config.ini")  # 读取配置文件，如果写文件的绝对路径，就可以不用os模块
         self.emailPass = cf.get("Email","pass")  # 发件人邮箱密码
@@ -37,3 +40,7 @@ class Connection:
         self.jgdyUrl=cf.get("Jgdy","fetchUrl")
         self.isJgdy=cf.get("Jgdy","isJgdy")
         self.savePath=cf.get("Path","savePath")
+
+        testCode=cf.get('Test','testCode')
+        if testCode!=None or testCode!='':
+            self.testCode=testCode

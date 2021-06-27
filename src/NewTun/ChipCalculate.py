@@ -36,6 +36,7 @@ class ChipCalculate:
                 continue
             # 拿到id
             baseIndex = int(Baseline[0])
+            currentPrice = float(Baseline[4])
             for i in range(80):
                 if i < 1:
                     continue
@@ -75,7 +76,7 @@ class ChipCalculate:
                     chip = Chip(index, open, close, max, min, avc_price, chouma)
                     self.DayChouMaList.append(chip)
             # 倒序计算完每日的筹码量，然后将筹码平均分布到当日的价格上
-            todayChouma, tmax, csdn = self.adviseChouMa2Price()
+            todayChouma, tmax, csdn ,maxVolprice= self.adviseChouMa2Price()
             if k == 0:
                 TtodayChouma = todayChouma
                 TTmax = tmax
@@ -85,6 +86,11 @@ class ChipCalculate:
             csdnTemp.append(TtodayChouma)
             csdnTemp.append("")
             csdnTemp.append(TTmax)
+            if currentPrice*100>maxVolprice:
+                #当前的价格大于筹码的平均价格
+                csdnTemp.append(1)
+            else:
+                csdnTemp.append(0)
             result.append(csdnTemp)
         return result
 
@@ -156,6 +162,7 @@ class ChipCalculate:
         totalVol = 0
         totalPrice = 0
         tmax = 0
+        maxVolprice=0
         for i in sorted(self.price_vol):
             # 这里的i就表示价格
             if isFirst == 1:
@@ -164,6 +171,7 @@ class ChipCalculate:
             # 寻找最大的筹码量
             if self.price_vol[i] > tmax:
                 tmax = self.price_vol[i]
+                maxVolprice = i
             # 计算当日的各个价格上的筹码量之和
             totalVol = totalVol + self.price_vol[i]
             # 计算当前价格上筹码的累计大小
@@ -174,7 +182,7 @@ class ChipCalculate:
             choumaList.append(cm)
         if totalVol == 0:
             csdn = 0
-            return choumaList, 0, tmax, csdn
+            return choumaList, 0, tmax, csdn,0
         else:
             csdn = round((totalPrice / totalVol) / 100, 2)
-            return choumaList, tmax, csdn
+            return choumaList, tmax, csdn,maxVolprice

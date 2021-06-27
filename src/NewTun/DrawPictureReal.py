@@ -33,6 +33,7 @@ class DrawPictureReal:
     def showK(self ,code,result ,isShow,savePath):
         savePath = savePath.strip()+"\\temp"
         self.savePath=savePath.rstrip("\\")
+        self.isTest=False
         self.isShow=isShow
         self.code=code
         t3Price = talib.T3(result['close'], timeperiod=30, vfactor=0)
@@ -171,3 +172,30 @@ class DrawPictureReal:
             plt.savefig(self.savePath+"\\"+self.code+".png")
             plt.close()
         return
+
+    def ax5ShowZsm(self, zsm, fList, priceBigvolPriceIndexs, iList,zList,sList):
+        if self.isShow:
+            for c in fList:
+                self.ax5.axvline(c, ls='-', c='#ed1941', lw=1)
+                self.ax1.axvline(c, ls='-', c='#ed1941', lw=2)
+
+            for i in priceBigvolPriceIndexs:
+                if zsm.__contains__(i):
+                    self.ax5.axvline(i, ls='-', c='#102b6a', lw=2)
+                    self.ax1.axvline(i, ls='-', c='#f47920', ymin=0, ymax=0.02, lw=10)
+
+            self.ax5.plot(iList, zList, c='#6950a1', lw=2, label='主力')
+            self.ax5.plot(iList, sList, c='#45b97c', lw=2, label='散户')
+            self.ax5.legend(loc='upper left')  # 图例放置于右上角
+            self.ax5.grid(True)  # 画网格
+
+    def savePng(self):
+        if self.isShow:
+            isExists = os.path.exists(self.savePath)
+            # 判断结果
+            if not isExists:
+                os.makedirs(self.savePath)
+            plt.savefig(self.savePath + "\\" + self.code + ".png")
+            if self.isTest:
+                plt.show()
+            plt.close()

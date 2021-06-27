@@ -10,6 +10,9 @@ from src.NewTun.LoopBack import LoopBack
 from src.NewTun.QueryStock import QueryStock
 import numpy as np
 
+
+
+
 class Application:
 
 
@@ -24,6 +27,8 @@ class Application:
     maxPrice=0
     currentPrice=0
     isDownLine=0
+
+    isZsm=0
 
     def setStackCode(self):
         least=LeastSquare()
@@ -59,13 +64,6 @@ class Application:
         return resultEnd
 
     def cv(self,temp):
-        # print(temp)
-        # minTemp=temp[0][1]
-        # for i in range(len(temp)):
-        #     if temp[i][1]!=0 and temp[i][1]<minTemp:
-        #         minTemp=temp[i][1]
-        # print(minTemp)
-        # temp[:,1]=temp[:,1]-minTemp
         sumF=np.sum(temp[:,1])
         sumfx=0
         sumfdoubleX=0
@@ -116,6 +114,8 @@ class Application:
         for i in range(len(resultEnd)):
             x.append(resultEnd[i][0])
             p.append(resultEnd[i][1])
+
+
         myResult = pd.DataFrame()
         myResult['tprice'] = p
         tianjingle = self.least.everyErChengPriceForArray(np.array(x), np.array(p), 30)
@@ -130,6 +130,17 @@ class Application:
             y1.append(kk)
         pingjunchengbendic = dict(zip(x1, y1))
         total=len(result)
+        z=float(result['z'][len(result) - 1])
+        s=float(result['s'][len(result)-1])
+        m=float(result['m'][len(result)-1])
+
+        #散户、主力、反转信号
+        # print("z="+str(z)+"\ts="+str(s)+"\tm="+str(m)+"\tp>c="+str(resultEnd[len(resultEnd)-1][5]))
+        zsmFlag=self.zsmIndexCalculate(z,s,m,resultEnd[len(resultEnd)-1])
+        if zsmFlag==1:
+            self.isZsm=1
+
+
         for i in range(len(erjieK)):
             item = erjieK[i]
             currentx = item[0]
@@ -159,6 +170,12 @@ class Application:
         self.loopBack=None
         self.queryStock=None
         return self
+
+    #查看是否符合主力、散户、反转、筹码公式
+    def zsmIndexCalculate(self, z,s,m, resultEndLastOne):
+        if z>s and m>0 and resultEndLastOne[5]>0:
+            return 1
+        return 0
 
 
 

@@ -2,6 +2,7 @@ import talib
 import pymysql.cursors
 import pandas as pd
 from src.NewTun.Connection import Connection
+from src.NewTun.ZSIndex import ZSIndex
 
 
 class QueryStock:
@@ -48,11 +49,18 @@ class QueryStock:
         result['M30']=talib.SMA(result['close'],30)
         result['T30']=talib.T3(result['close'],timeperiod=30, vfactor=0)
         result['tprice']=talib.TYPPRICE(result['high'],result['low'],result['close'])
-        slowk, slowd = talib.STOCH(result['high'],result['low'],result['close'], fastk_period=9, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
-        slowj= list(map(lambda x,y: 3*x-2*y, slowk, slowd))
-        result['k']=slowk
-        result['d']=slowd
-        result['j']=slowj
+        # slowk, slowd = talib.STOCH(result['high'],result['low'],result['close'], fastk_period=9, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0)
+        # slowj= list(map(lambda x,y: 3*x-2*y, slowk, slowd))
+        # result['k']=slowk
+        # result['d']=slowd
+        # result['j']=slowj
+        zsindex=ZSIndex()
+        # 主力线，散户线
+        zz, ss = zsindex.zsLine(result)
+        mm = zsindex.convertXQH(result)
+        result['z'] = zz
+        result['s'] = ss
+        result['m'] = mm
         maxPrice=talib.MAX(result['close'],data)[len(result)-1]
         print(maxPrice)
         result.date = range(0, len(result))  # 日期改变成序号
@@ -87,6 +95,8 @@ class QueryStock:
             temp.append(row[3])
             temp.append(row[4])
             temp.append(row[5])
+            #主力、散户、反转
+            temp.append(row[12])
             codes.append(temp)
         # 关闭连接
         cursor.close()
@@ -224,10 +234,10 @@ class QueryStock:
         connect.close()
         return temp
 
-    def queryStockYouBrought(self):
+    def queryStockYouBrought(self,statisticSql):
         result=[]
-        sql = "SELECT * FROM candidate_stock where is_down_line=1 and profit!=0 and price<=10 order by profit desc"
-        sql = "select a.* from candidate_stock a inner join (SELECT id,code,min(collect_date),profit from candidate_stock where is_down_line=1 and profit!=0 and price<=10 and price>3 group by code order by profit desc) b where a.id=b.id"
+
+        sql = "select a.* from candidate_stock a inner join (SELECT id,code,min(collect_date),profit from candidate_stock where "+statisticSql+" group by code order by profit desc) b where a.id=b.id"
         connection = Connection()
         connect = pymysql.Connect(
             host=connection.host,
@@ -235,7 +245,8 @@ class QueryStock:
             user=connection.user,
             passwd=connection.passwd,
             db=connection.db,
-            charset=connection.charset
+            charset=connection.charset,
+            sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
         )
         # 获取游标
         cursor = connect.cursor()

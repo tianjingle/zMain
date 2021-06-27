@@ -49,6 +49,11 @@ class ApplicationWithDraw:
         resultEnd = calcualate.getDataByShowLine(chipCalculateList)
         return resultEnd
 
+    def executeForTest(self,code,savePath):
+        result=self.queryStock.queryStock(code)
+        if len(result[0])<200:
+            return self
+        return self.core(result[0],code,True,savePath,True)
 
 
     #执行器
@@ -56,11 +61,12 @@ class ApplicationWithDraw:
         result=self.queryStock.queryStock(code)
         if len(result[0])<200:
             return self
-        return self.core(result[0],code,isShow,savePath)
+        return self.core(result[0],code,isShow,savePath,False)
 
     #核心调度器
-    def core(self,result,code,isShow,savePath):
+    def core(self,result,code,isShow,savePath,isTest):
         self.draw.showK(code,result,isShow,savePath)
+        self.draw.isTest=isTest
         #十四天
         Kflag=self.least.everyErChengPrice(result,14,True)
         #三十天
@@ -112,17 +118,22 @@ class ApplicationWithDraw:
 
         # 筹码计算
         resultEnd = self.chipCalculate(result, self.queryStock.start)
-        x = []
-        p = []
         resultEnd.sort(key=lambda resultEnd: resultEnd[0])
         resultEndLength = len(resultEnd)
         string = ""
+        x = []
+        p = []
+        priceBigvolPriceIndexs = []
         for i in range(len(resultEnd)):
             x.append(resultEnd[i][0])
             string = string + "," + str(resultEnd[i][1])
             p.append(resultEnd[i][1])
             if i == resultEndLength - 1:
                 priceJJJ = resultEnd[i][1]
+            #价格大于50%的筹码线
+            if resultEnd[i][5] == 1:
+                priceBigvolPriceIndexs.append(resultEnd[i][0])
+
         myResult = pd.DataFrame()
         myResult['tprice'] = p
         tianjingle = self.least.everyErChengPriceForArray(np.array(x), np.array(p), 30)
@@ -206,6 +217,26 @@ class ApplicationWithDraw:
         #画线条
         self.draw.klineInfo(buyList,sellList)
 
+        #主力散户反转信号
+        iList = []
+        zList = []
+        sList = []
+        fList = []
+        zsm = {}
+        for index, row in result.iterrows():
+            iList.append(index -self.queryStock.start)
+            z = float(row['z'])
+            s = float(float(row['s']))
+            zList.append(z)
+            sList.append(s)
+            convert = int(row['m'])
+            if convert == 1:
+                fList.append(index -self.queryStock.start)
+            if z > s and convert == 1:
+                zsm[index -self.queryStock.start] = 1
+
+
+
         #找到最小的那一个
         for item in erjieK:
             if item[1]!=None and item[1]<downlimitTemp:
@@ -214,8 +245,15 @@ class ApplicationWithDraw:
         self.draw.drawDownLine(abs(downlimitTemp) * (self.downlimit / 100))
         for item in erjieK:
             item[2]=item[1]/downlimitTemp*100
-        self.loopBack.testNewTon(NewtonBuySall,self.indexCloseDict)
-        self.draw.ax5Show(self.loopBack.baseRmb,self.loopBack.buysell,self.loopBack.myRmb)
+
+        # self.loopBack.testNewTon(NewtonBuySall,self.indexCloseDict)
+        # self.draw.ax5Show(self.loopBack.baseRmb,self.loopBack.buysell,self.loopBack.myRmb)
+
+
+        self.draw.ax5ShowZsm(zsm,fList,priceBigvolPriceIndexs,iList,zList,sList)
+
+
+        self.draw.savePng()
         return self
 
 

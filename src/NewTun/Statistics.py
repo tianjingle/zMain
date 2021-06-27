@@ -6,7 +6,7 @@ from src.NewTun.QueryStock import QueryStock
 class Statistics:
 
 
-    def fetchStocks(self):
+    def statistic(self):
         query = QueryStock()
         codeList = query.queryHistoryStock()
         for item in codeList:
