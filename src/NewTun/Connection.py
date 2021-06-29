@@ -20,6 +20,7 @@ class Connection:
     savePath=''
 
     testCode=''
+    isTest=False
 
     def __init__(self):
 
@@ -42,5 +43,8 @@ class Connection:
         self.savePath=cf.get("Path","savePath")
 
         testCode=cf.get('Test','testCode')
-        if testCode!=None or testCode!='':
+        if testCode!='':
             self.testCode=testCode
+            self.isTest=True
+        else:
+            self.isTest=False

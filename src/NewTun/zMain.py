@@ -78,7 +78,7 @@ class zMain:
         tableCheckSql = "show tables like 'candidate_stock'"
         cursor.execute(tableCheckSql)
         if len(list(cursor)) == 0:
-            createTable = "create table candidate_stock(id varchar(64) primary key not null,code varchar(64),name varchar(64),collect_date varchar(64),industry varchar(64),grad float,cv float,price float,now_price float,profit float,other varchar(45),is_down_line int)"
+            createTable = "create table candidate_stock(id varchar(64) primary key not null,code varchar(64),name varchar(64),collect_date varchar(64),industry varchar(64),grad float,cv float,price float,now_price float,profit float,other varchar(45),is_down_line int,zsm int)"
             cursor.execute(createTable)
         print("-----------------------------scan stock------------------------------------")
         print("start time:" + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
@@ -96,8 +96,10 @@ class zMain:
             if kk.isZsm==1:
                 print("--------主力、散户、反转信号出现------")
                 print(item[0]+"---"+item[1])
+            elif kk.isZsm==2:
+                print("up")
 
-            if test.avgCostGrad < 0 or kk.isZsm==1:
+            if test.avgCostGrad < 0 or kk.isZsm>=1:
                 candidateTemp = []
                 candidateTemp.append(item[0])
                 candidateTemp.append(item[1])
@@ -113,6 +115,12 @@ class zMain:
                     sql = "INSERT INTO candidate_stock (id, code, name,collect_date,industry,grad,cv,is_down_line,zsm) VALUES ( '%s', '%s','%s', '%s','%s', %.8f, %.8f,%i,%i)"
                     data = (uuid.uuid1(), item[0], item[1],today,item[3],test.avgCostGrad,abs(test.cvValue),test.isDownLine,kk.isZsm)
                     cursor.execute(sql % data)
+                elif kk.isZsm > 0:
+                    # 开始修正
+                    print("修正..")
+                    sql = "update candidate_stock set zsm=" + str(kk.isZsm) + " where collect_date='" + today + "' and code='" + item[0] + "' and id!=''"
+                    print(sql)
+                    cursor.execute(sql)
                 connect.commit()
             # 垃圾回收
             del kk, test
@@ -142,17 +150,21 @@ class zMain:
 zm=zMain()
 sendEmail=SendEmail()
 s=Statistics()
-# # #同步历史数据
-# zm.synHistoryStock()
-# # #扫描选股
-zm.scanStock()
-# # #股票排名
-# zm.sortByStockGrad()
-# # #作图
-zm.stockShow()
-# #统计股票盈利情况
-s.statistic()
-# 分类股票推荐发送
-sendEmail.sendYouCanBuy(zm.currentPath)
+#是否是单图测试
+if zm.connection.isTest:
+    zm.stockShow()
+else:
+    # # #同步历史数据
+    # zm.synHistoryStock()
+    # # #扫描选股
+    zm.scanStock()
+    # #股票排名
+    zm.sortByStockGrad()
+    # # #作图
+    zm.stockShow()
+    # #统计股票盈利情况
+    s.statistic()
+    # 分类股票推荐发送
+    sendEmail.sendYouCanBuy(zm.currentPath)
 
 

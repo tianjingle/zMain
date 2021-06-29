@@ -115,6 +115,10 @@ class Application:
             x.append(resultEnd[i][0])
             p.append(resultEnd[i][1])
 
+        #最后一天得价格是否大于筹码峰
+        bigVolPriceLastOne=resultEnd[len(resultEnd)-1][5]
+        print(bigVolPriceLastOne)
+
 
         myResult = pd.DataFrame()
         myResult['tprice'] = p
@@ -140,7 +144,6 @@ class Application:
         if zsmFlag==1:
             self.isZsm=1
 
-
         for i in range(len(erjieK)):
             item = erjieK[i]
             currentx = item[0]
@@ -162,6 +165,8 @@ class Application:
                             self.isDownLine=1
                         else:
                             self.isDownLine=0
+                        if bigVolPriceLastOne == 1:
+                            self.isZsm = 2
                         print(self.currentPrice)
                         print(self.maxPrice)
                         print(self.isDownLine)

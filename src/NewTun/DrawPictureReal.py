@@ -112,6 +112,8 @@ class DrawPictureReal:
             for item in buyList:
                 self.ax2.scatter(item[0], item[1], color=item[2], linewidth=0.0004)
                 self.ax1.axvline(item[0], ls='-', color=item[2], lw=0.5)
+                if item[3]==1:
+                    self.ax1.axvline(item[0], ls='-', c='g', lw=5, ymin=0, ymax=0.02)
 
             for item in sellList:
                 self.ax2.scatter(item[0], item[1], color=item[2], linewidth=0.0004)

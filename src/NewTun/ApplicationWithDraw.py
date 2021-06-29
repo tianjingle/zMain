@@ -124,6 +124,7 @@ class ApplicationWithDraw:
         x = []
         p = []
         priceBigvolPriceIndexs = []
+        bigVolPrice = {}
         for i in range(len(resultEnd)):
             x.append(resultEnd[i][0])
             string = string + "," + str(resultEnd[i][1])
@@ -133,6 +134,26 @@ class ApplicationWithDraw:
             #价格大于50%的筹码线
             if resultEnd[i][5] == 1:
                 priceBigvolPriceIndexs.append(resultEnd[i][0])
+                bigVolPrice[resultEnd[i][0]] = 1
+
+        #主力散户反转信号
+        iList = []
+        zList = []
+        sList = []
+        fList = []
+        zsm = {}
+        for index, row in result.iterrows():
+            iList.append(index -self.queryStock.start)
+            z = float(row['z'])
+            s = float(float(row['s']))
+            zList.append(z)
+            sList.append(s)
+            convert = int(row['m'])
+            if convert == 1:
+                fList.append(index -self.queryStock.start)
+            if z > s and convert == 1:
+                zsm[index -self.queryStock.start] = 1
+
 
         myResult = pd.DataFrame()
         myResult['tprice'] = p
@@ -181,6 +202,10 @@ class ApplicationWithDraw:
                     buyTemp.append(currentx)
                     buyTemp.append(twok)
                     buyTemp.append("g")
+                    if bigVolPrice.__contains__(currentx):
+                        buyTemp.append(1)
+                    else:
+                        buyTemp.append(0)
                     buyList.append(buyTemp)
                     if currentx==total-1:
                         self.avgCostGrad=onkchengben
@@ -210,6 +235,10 @@ class ApplicationWithDraw:
                 buyTemp.append(currentx)
                 buyTemp.append(twok)
                 buyTemp.append("g")
+                if bigVolPrice.__contains__(currentx):
+                    buyTemp.append(1)
+                else:
+                    buyTemp.append(0)
                 buyList.append(buyTemp)
             oldTwok = twok
             oldOne = onek
@@ -217,23 +246,7 @@ class ApplicationWithDraw:
         #画线条
         self.draw.klineInfo(buyList,sellList)
 
-        #主力散户反转信号
-        iList = []
-        zList = []
-        sList = []
-        fList = []
-        zsm = {}
-        for index, row in result.iterrows():
-            iList.append(index -self.queryStock.start)
-            z = float(row['z'])
-            s = float(float(row['s']))
-            zList.append(z)
-            sList.append(s)
-            convert = int(row['m'])
-            if convert == 1:
-                fList.append(index -self.queryStock.start)
-            if z > s and convert == 1:
-                zsm[index -self.queryStock.start] = 1
+
 
 
 
