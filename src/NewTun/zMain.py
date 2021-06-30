@@ -155,7 +155,7 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # # #同步历史数据
-    # zm.synHistoryStock()
+    zm.synHistoryStock()
     # # #扫描选股
     zm.scanStock()
     # #股票排名

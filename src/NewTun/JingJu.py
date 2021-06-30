@@ -34,14 +34,16 @@ class JingJu:
         if len(self.list)==0:
             return '不劳而获是这世界上最大的坏！'
 
-        fi=open(self.indexFile,"r+",encoding="utf-8")
+        fi=open(self.indexFile,"r",encoding="utf-8")
         index=fi.readlines()
         if len(index)!=0 and index[0].strip()!='':
             index=int(index[0])
-            self.index=index+1
+            self.index=int(index)+1
             if self.index>len(self.list):
                 self.index=0
-
+        else:
+            self.index=0
+        fi = open(self.indexFile, "w", encoding="utf-8")
         print(self.list[self.index])
         fi.write(str(self.index))
         fi.close()

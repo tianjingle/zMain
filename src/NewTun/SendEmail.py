@@ -54,7 +54,7 @@ class SendEmail:
 
     def doSendStockInfoBeautiful(self,codes,currentPath,subject):
         con=Connection()
-        myContent="<h4>< font color = 'red' > " + self.getJingjuNext() + " < / font ></h4></br>"
+        myContent="<h4><font color = 'red' > " + self.getJingjuNext() + " </font ></h4></br>"
         imgsOKstr = myContent+"<p>股票总计："+str(len(codes))
         count=80
         #前二十的股票提供图片显示
@@ -118,7 +118,7 @@ class SendEmail:
 
     def sendStockInfo(self,codes,currentPath):
         con=Connection()
-        myContent="<h4>< font color = 'red' > " + self.getJingjuNext() + " < / font ></h4></br>"
+        myContent="<h4><font color = 'red' > " + self.getJingjuNext() + " </font ></h4></br>"
         imgsOKstr = myContent+"当下可选股票："
         count=60
         #前二十的股票提供图片显示
@@ -185,7 +185,7 @@ class SendEmail:
     # 发送邮件
     def sendStatistic(self,result,title):
         successCount=0
-        myContent="<h4>< font color = 'red' > " + self.getJingjuNext() + " < / font ></h4></br>"
+        myContent="<h4><font color = 'red' > " + self.getJingjuNext() + " </font ></h4></br>"
         htmls = myContent+"<table border='1'>"
         htmls=htmls+"<tr><td>代码</td><td>名称</td><td>买入时间</td><td>grad</td><td>cv</td><td>买入价格</td><td>当前价格</td><td>增长幅度100%</td></tr>"
         for item in result:
