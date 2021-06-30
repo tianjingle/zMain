@@ -155,15 +155,15 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # # #同步历史数据
-    zm.synHistoryStock()
+    # zm.synHistoryStock()
     # # #扫描选股
-    zm.scanStock()
+    # zm.scanStock()
     # #股票排名
-    zm.sortByStockGrad()
+    # zm.sortByStockGrad()
     # # #作图
-    zm.stockShow()
+    # zm.stockShow()
     # #统计股票盈利情况
-    s.statistic()
+    # s.statistic()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
 

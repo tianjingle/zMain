@@ -15,6 +15,7 @@ class SendEmail:
     tendown=[]
     other=[]
     Zsm=[]
+    GSM=[]
     jingju=JingJu()
 
 
@@ -37,16 +38,20 @@ class SendEmail:
             else:
                 self.other.append(temp)
             #主力、散户、反转信号
-            if item[5]==1 or item[5]==2:
+            if item[5]==1:
                 self.Zsm.append(temp)
+            if item[5]==2:
+                self.GSM.append(temp)
 
         self.tendown=sorted(self.tendown, key=lambda s: s[2],reverse=False)
         self.other=sorted(self.other, key=lambda s: s[2],reverse=False)
-        self.Zsm=sorted(self.Zsm, key=lambda s: s[3],reverse=True)
-        self.doSendStockInfoBeautiful(self.Zsm,currentPath,"回踩反弹股票")
+        self.Zsm=sorted(self.Zsm, key=lambda s: s[2],reverse=True)
+        self.GSM=sorted(self.GSM, key=lambda s: s[2],reverse=True)
+        self.doSendStockInfoBeautiful(self.Zsm,currentPath,"回踩反弹")
+        self.doSendStockInfoBeautiful(self.GSM,currentPath,"底部吸筹")
         self.doSendStatisticForZsm()
-        self.doSendStockInfoBeautiful(self.tendown,currentPath,"低价股票")
-        self.doSendStockInfoBeautiful(self.other,currentPath,"高价股票")
+        self.doSendStockInfoBeautiful(self.tendown,currentPath,"   10+元以内")
+        self.doSendStockInfoBeautiful(self.other,currentPath,"  10-元以上")
         self.doSendStatisticPaper()
 
     def getJingjuNext(self):
@@ -180,7 +185,9 @@ class SendEmail:
     def doSendStatisticForZsm(self):
         query = QueryStock()
         result = query.queryStockYouBrought("zsm=1")
-        self.sendStatistic(result," 回踩反弹统计")
+        self.sendStatistic(result," 回踩反弹-统计")
+        result = query.queryStockYouBrought("zsm=2")
+        self.sendStatistic(result," 底部吸筹-统计")
 
     # 发送邮件
     def sendStatistic(self,result,title):
