@@ -92,8 +92,9 @@ class StockInfoSyn:
                     startTime1=row[0]
                     if int(row[11])==0:
                         print(realCode+"\t 暂停交易了，您可能需要baostock跑个全量")
-                        continue
-                    bili=float(row[7])*float(row[10])
+                        bili=1
+                    else:
+                        bili=float(row[7])*float(row[10])
                     if startTime1==endTime:
                         isToady=True
                         continue
