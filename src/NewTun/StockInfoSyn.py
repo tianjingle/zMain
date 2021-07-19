@@ -92,12 +92,12 @@ class StockInfoSyn:
                     startTime1=row[0]
                     if int(row[11])==0:
                         print(realCode+"\t 暂停交易了，您可能需要baostock跑个全量")
-                        bili=1
+                        bili=0
                     else:
                         amount=row[7]
-                        amount1=1
+                        amount1=0
                         true=row[10]
-                        true1=1
+                        true1=0
                         if amount!='':
                             amount1=float(amount)
                         if true!='':
@@ -118,7 +118,7 @@ class StockInfoSyn:
                 if connection.tdxDayPath=='':
                     fectExecute.fetchByStartAndEndTime(realCode,startTime,endTime)
                 else:
-                    if bili==1:
+                    if bili==0:
                         fectExecute.fetchByStartAndEndTime(realCode, startTime, endTime)
                     else:
                         fectExecute.parseDataFromCvs(connection.tdxDayPath,realCode,startTime,endTime,bili)
