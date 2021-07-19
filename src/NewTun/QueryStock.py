@@ -61,6 +61,11 @@ class QueryStock:
         result['z'] = zz
         result['s'] = ss
         result['m'] = mm
+        #神仙趋势线
+        result['h1']=talib.EMA(result['close'],6)
+        result['h2']=talib.EMA(result['h1'],18)
+        result['h3']=talib.EMA(result['close'],108)
+
         maxPrice=talib.MAX(result['close'],data)[len(result)-1]
         print(maxPrice)
         result.date = range(0, len(result))  # 日期改变成序号

@@ -19,6 +19,8 @@ class Connection:
     scans=2000
     savePath=''
 
+    tdxDayPath=''
+
     testCode=''
     isTest=False
 
@@ -41,6 +43,7 @@ class Connection:
         self.jgdyUrl=cf.get("Jgdy","fetchUrl")
         self.isJgdy=cf.get("Jgdy","isJgdy")
         self.savePath=cf.get("Path","savePath")
+        self.tdxDayPath=cf.get("Path","tdxDayPath")
 
         testCode=cf.get('Test','testCode')
         if testCode!='':

@@ -12,6 +12,8 @@ class StockInfoSyn:
     #是否拉取机构调研消息
     isJgdy=False
 
+    stockMap={}
+
     #tushare code转化为baostock code
     def tuShareCode2BaoStockCode(self,tuShareCode):
         code=tuShareCode.lower().split('.')
@@ -70,6 +72,7 @@ class StockInfoSyn:
         startTime=''
         endTime=time.strftime('%Y-%m-%d',time.localtime(time.time()))
         isToady=False
+        bili=1
         for row in cursor.fetchall():
             isToady=False
             print(row[0])
@@ -87,6 +90,10 @@ class StockInfoSyn:
                 #如果没有数据那么设置为1997年开始
                 for row in cursor.fetchall():
                     startTime1=row[0]
+                    if int(row[11])==0:
+                        print(realCode+"\t 暂停交易了，您可能需要baostock跑个全量")
+                        continue
+                    bili=float(row[7])*float(row[10])
                     if startTime1==endTime:
                         isToady=True
                         continue
@@ -98,7 +105,11 @@ class StockInfoSyn:
             else:
                 print("syn  "+realCode)
                 fectExecute= StockFetch()
-                fectExecute.fetchByStartAndEndTime(realCode,startTime,endTime)
+                #优先从通达信获取数据
+                if connection.tdxDayPath=='':
+                    fectExecute.fetchByStartAndEndTime(realCode,startTime,endTime)
+                else:
+                    fectExecute.parseDataFromCvs(connection.tdxDayPath,realCode,startTime,endTime,bili)
             if self.isJgdy=='True':
                 jgdy = JgdyQuery()
                 jgdy.printJgdyInfo(realCode.split('.')[1], 1)

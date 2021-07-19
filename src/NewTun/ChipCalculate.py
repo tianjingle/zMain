@@ -3,6 +3,8 @@ from src.NewTun.Chip import Chip
 
 
 class ChipCalculate:
+
+    isProd=False
     shuanJian = 1
 
     # 1.价格和筹码量的分布
@@ -17,7 +19,8 @@ class ChipCalculate:
     # 倒叙计算每日的筹码量
     # 传入的数据id,open,high,low,close,volume,typePrice,trun
     #          0,   1,   2,  3,   4,    5,    6,       7
-    def getDataByShowLine(self, data):
+    def getDataByShowLine(self, data,prod):
+        self.isProd=True
         result = []
         dataLength = len(data)
         csdnAvcPrice = []
@@ -76,7 +79,7 @@ class ChipCalculate:
                     chip = Chip(index, open, close, max, min, avc_price, chouma)
                     self.DayChouMaList.append(chip)
             # 倒序计算完每日的筹码量，然后将筹码平均分布到当日的价格上
-            todayChouma, tmax, csdn ,maxVolprice= self.adviseChouMa2Price()
+            todayChouma, tmax, csdn ,maxVolprice,myUp= self.adviseChouMa2Price()
             if k == 0:
                 TtodayChouma = todayChouma
                 TTmax = tmax
@@ -91,6 +94,7 @@ class ChipCalculate:
                 csdnTemp.append(1)
             else:
                 csdnTemp.append(0)
+            csdnTemp.append(myUp)
             result.append(csdnTemp)
         return result
 
@@ -182,7 +186,26 @@ class ChipCalculate:
             choumaList.append(cm)
         if totalVol == 0:
             csdn = 0
-            return choumaList, 0, tmax, csdn,0
+            return choumaList, 0, tmax, csdn,0,0
         else:
-            csdn = round((totalPrice / totalVol) / 100, 2)
-            return choumaList, tmax, csdn,maxVolprice
+            originSpend=(totalPrice / totalVol)
+            csdn = round( originSpend/ 100, 2)
+            myUp=1
+            if self.isProd==True:
+                close = self.DayChouMaList[0].getClose()
+                downPower=0
+                upPower=0
+                for i in sorted(self.price_vol):
+                    # 这里的i就表示价格
+                    #战斗力对比
+                    tP=close-round(i/100,2)
+                    if tP<0:
+                        downPower=downPower+(tP*self.price_vol[i])
+                    if tP>0:
+                        upPower=upPower+(tP*self.price_vol[i])
+                result=upPower+downPower
+                if result>=0:
+                    myUp=1
+                else:
+                    myUp=0
+            return choumaList, tmax, csdn,maxVolprice,myUp

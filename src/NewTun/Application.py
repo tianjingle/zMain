@@ -59,7 +59,7 @@ class Application:
         if isProd==False:
             chipCalculateList=chipCalculateList[-112:]
         calcualate = ChipCalculate()
-        resultEnd = calcualate.getDataByShowLine(chipCalculateList)
+        resultEnd = calcualate.getDataByShowLine(chipCalculateList,isProd)
         del calcualate
         return resultEnd
 
@@ -117,6 +117,7 @@ class Application:
 
         #最后一天得价格是否大于筹码峰
         bigVolPriceLastOne=resultEnd[len(resultEnd)-1][5]
+        myUp=resultEnd[len(resultEnd)-1][6]
         print(bigVolPriceLastOne)
 
 
@@ -144,6 +145,8 @@ class Application:
         if zsmFlag==1:
             self.isZsm=1
 
+
+
         for i in range(len(erjieK)):
             item = erjieK[i]
             currentx = item[0]
@@ -165,7 +168,7 @@ class Application:
                             self.isDownLine=1
                         else:
                             self.isDownLine=0
-                        if bigVolPriceLastOne == 1:
+                        if bigVolPriceLastOne == 1 and myUp==1:
                             self.isZsm = 2
                         print(self.currentPrice)
                         print(self.maxPrice)

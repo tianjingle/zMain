@@ -190,7 +190,7 @@ class DrawPictureReal:
             self.ax5.plot(iList, sList, c='#45b97c', lw=2, label='散户')
             self.ax5.legend(loc='upper left')  # 图例放置于右上角
             self.ax5.grid(True)  # 画网格
-
+    #保存图片
     def savePng(self):
         if self.isShow:
             isExists = os.path.exists(self.savePath)
@@ -201,3 +201,25 @@ class DrawPictureReal:
             if self.isTest:
                 plt.show()
             plt.close()
+
+    #神仙趋势线
+    def shenxianQS(self, testX, H1, H2, H3):
+        self.ax4.plot(testX, H1, c="red", label='h1')
+        self.ax4.plot(testX, H2, c="green", label='h2')
+        self.ax4.plot(testX, H3, c="yellow", label='h3')
+        qiangshi=[]
+        for i in range(len(testX)):
+            if H1[i]!=None and H2[i]!=None and H3[i]!=None:
+                if H1[i]>H2[i] and H3[i]<H2[i]:
+                    qiangshi.append(i)
+                    self.ax1.axvline(i, ls='-', c='red', ymin=0, ymax=0.04, lw=1)
+                if H1[i]<H2[i] and H3[i]>H2[i]:
+                    self.ax1.axvline(i, ls='-', c='blue', ymin=0, ymax=0.04, lw=1)
+                if H1[i]>H2[i] and H3[i]>H1[i]:
+                    self.ax1.axvline(i, ls='-', c='yellow', ymin=0, ymax=0.04, lw=1)
+                if H1[i]<H2[i] and H3[i]<H1[i]:
+                    self.ax1.axvline(i, ls='-', c='green', ymin=0, ymax=0.04, lw=1)
+                if H1[i]>H3[i] and H3[i]>H2[i] or H2[i]>H3[i] and H3[i]>H1[i]:
+                    self.ax1.axvline(i, ls='-', c='white', ymin=0, ymax=0.04, lw=1)
+
+        pass
