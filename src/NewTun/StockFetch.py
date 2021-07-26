@@ -31,7 +31,7 @@ class StockFetch:
         rs = bs.query_history_k_data_plus(code,
                                           "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
                                           start_date=startTime, end_date=endTime,
-                                          frequency="d", adjustflag="3")
+                                          frequency="d", adjustflag="2")
 
         #### 打印结果集 ####
         data_list = []
@@ -47,6 +47,8 @@ class StockFetch:
         # 插入数据库
         result.to_sql(name=code, con=engine, if_exists='append', index=False, index_label=False)
 
+
+    #todo 通达信的数据这块需要兼容一下，这次先不做了
     def parseDataFromCvs(self,path,code, startTime, endTime,bili):
         file=code.split(".")[1]
         temp=self.tdxData.readData(path+file+".csv",startTime,endTime)

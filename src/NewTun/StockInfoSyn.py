@@ -81,7 +81,7 @@ class StockInfoSyn:
             cursor.execute(tableCheckSql)
             if len(list(cursor))==0:
                 print("no data of "+realCode)
-                startTime='1997-07-01'
+                startTime='2015-01-01'
             else:
                 # 查找股票的最近时间
                 sql = "SELECT * FROM `%s` order by date desc limit 1;"

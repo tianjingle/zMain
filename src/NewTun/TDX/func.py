@@ -339,8 +339,13 @@ def readall_local_cwfile():
     print(f'开始载入所有财报文件到内存')
     dict = {}
     cwfile_list = os.listdir(ucfg.tdx['csv_cw'])  # cw目录 生成文件名列表
+    result=[]
+    for item in cwfile_list:
+        if item.endswith(".pkl"):
+            result.append(item)
+
     starttime_tick = time.time()
-    for cwfile in cwfile_list:
+    for cwfile in result:
         if os.path.getsize(ucfg.tdx['csv_cw'] + os.sep + cwfile) != 0:
             dict[cwfile[4:-4]] = pd.read_pickle(ucfg.tdx['csv_cw'] + os.sep + cwfile, compression=None)
     print(f'读取所有财报文件完成 用时{(time.time() - starttime_tick):.2f}秒')
