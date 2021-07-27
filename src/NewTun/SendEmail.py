@@ -195,10 +195,13 @@ class SendEmail:
         myContent="<h4><font color = 'red' > " + self.getJingjuNext() + " </font ></h4></br>"
         htmls = myContent+"<table border='1'>"
         htmls=htmls+"<tr><td>代码</td><td>名称</td><td>买入时间</td><td>grad</td><td>cv</td><td>买入价格</td><td>当前价格</td><td>增长幅度100%</td></tr>"
+        todayCount=0
         for item in result:
             htmls=htmls+"<tr>"
-            if float(item[7]) > 0:
+            if None!=item[7] and float(item[7]) > 0:
                 successCount = successCount + 1
+            elif None!=item[7] and float(item[7]) == 0:
+                todayCount=todayCount+1
             for vo in range(len(item)):
                 if float(item[7])>0:
                     htmls=htmls+"<td bgcolor='#FFCC66'><font color='red'>" + str(item[vo]) + "</font></td>"
@@ -206,7 +209,7 @@ class SendEmail:
                     htmls = htmls + "<td bgcolor='#00FF00'><font color='blue'>" + str(item[vo]) + "</font></td>"
             htmls=htmls+"</tr>"
         htmls=htmls+"</table>"
-        totalCount=len(result)
+        totalCount=len(result)-todayCount
         if totalCount==0:
             totalCount=1
         endHtml="增长个数:"+str(successCount)+"&nbsp&nbsp&nbsp&nbsp总共个数："+str(totalCount)+"                </br> 百分比："+str(successCount*100/totalCount)+"%"+htmls
