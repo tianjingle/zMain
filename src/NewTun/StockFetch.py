@@ -49,7 +49,7 @@ class StockFetch:
 
 
     #todo 通达信的数据这块需要兼容一下，这次先不做了
-    def parseDataFromCvs(self,path,code, startTime, endTime,bili):
+    def parseDataFromCvs(self,path,code, startTime, endTime):
         file=code.split(".")[1]
         temp=self.tdxData.readData(path+file+".csv",startTime,endTime)
         sql="insert into noun.`"+code+"` values"
