@@ -58,7 +58,7 @@ class StockFetch:
         sqlTemp=""
         # '2021-07-15', '000002', '23.21', '23.73', '23.01', '23.52', '63981243', '1498254976'
         for item in temp:
-            sqlTemp=sqlTemp+",('"+item[0]+"','"+code+"','"+item[2]+"','"+item[3]+"','"+item[4]+"','"+item[5]+"',"+"0,'"+item[6]+"','"+item[7]+"',3,'"+str(float(item[6])/bili)+"',1,0,0)"
+            sqlTemp=sqlTemp+",('"+item[0]+"','"+code+"','"+item[2]+"','"+item[3]+"','"+item[4]+"','"+item[5]+"',"+"0,'"+item[6]+"','"+item[7]+"',2,'"+item[11]+"',1,0,0)"
         sqlTemp=sqlTemp.strip(",")
         sql=sql+sqlTemp
         connection = Connection()
