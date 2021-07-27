@@ -86,6 +86,8 @@ class zMain:
         basicStock = syn.getBiscicStock()
         count = 0
         for item in basicStock:
+            if item[1].__contains__("ST"):
+                continue
             count = count + 1
             test = Application()
             if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None:
