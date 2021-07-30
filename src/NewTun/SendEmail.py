@@ -1,3 +1,4 @@
+import datetime
 import os
 import smtplib
 import time
@@ -7,6 +8,7 @@ from email.mime.text import MIMEText
 from email.header import Header
 
 from src.NewTun.Connection import Connection
+from src.NewTun.JgdyQuery import JgdyQuery
 from src.NewTun.JingJu import JingJu
 from src.NewTun.QueryStock import QueryStock
 
@@ -33,11 +35,36 @@ class SendEmail:
             temp.append(item[4])
             temp.append(item[5])
             temp.append(price)
+            temp.append("")   #5
+            temp.append("")   #6
+            temp.append("")   #8
             if price<=10:
                 self.tendown.append(temp)
             else:
                 self.other.append(temp)
             #主力、散户、反转信号
+
+            jgdy = JgdyQuery()
+            current = jgdy.printJgdyInfo(item[0].split('.')[1], 1)
+            if len(current) > 0:
+                diaoy = '<b>1.机构调研：</b></br>'
+                for z in current:
+                    jgdyDate=z[8]
+                    str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                    dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+                    startTime=(dateTime_p + datetime.timedelta(days=-100)).strftime("%Y-%m-%d")
+                    if jgdyDate>startTime:
+                        ztemp = z[8] + "&nbsp;&nbsp;" + z[11] + "&nbsp;&nbsp;" + z[15] + "</br>"
+                        diaoy = diaoy + ztemp
+                if diaoy!='<b>1.机构调研：</b></br>':
+                    temp[5] = diaoy
+                    temp[6]=len(current)
+                else:
+                    temp[6] = 0
+            else:
+                temp[5] = ""
+                temp[6]=0
+
             if item[5]==1:
                 self.Zsm.append(temp)
             if item[5]==2:
@@ -45,14 +72,14 @@ class SendEmail:
 
         self.tendown=sorted(self.tendown, key=lambda s: s[2],reverse=False)
         self.other=sorted(self.other, key=lambda s: s[2],reverse=False)
-        self.Zsm=sorted(self.Zsm, key=lambda s: s[2],reverse=True)
-        self.GSM=sorted(self.GSM, key=lambda s: s[2],reverse=True)
-        self.doSendStockInfoBeautiful(self.Zsm,currentPath,"回踩反弹")
-        self.doSendStockInfoBeautiful(self.GSM,currentPath,"底部吸筹")
+        self.Zsm=sorted(self.Zsm, key=lambda s: s[6],reverse=True)
+        self.GSM=sorted(self.GSM, key=lambda s: s[6],reverse=True)
+        self.doSendStockInfoBeautiful(self.Zsm,currentPath,"\t001回踩反弹")
+        self.doSendStockInfoBeautiful(self.GSM,currentPath,"\t002底部吸筹")
         self.doSendStatisticForZsm()
-        self.doSendStockInfoBeautiful(self.tendown,currentPath,"   10+元以内")
-        self.doSendStockInfoBeautiful(self.other,currentPath,"  10-元以上")
-        self.doSendStatisticPaper()
+        # self.doSendStockInfoBeautiful(self.tendown,currentPath,"   10+元以内")
+        # self.doSendStockInfoBeautiful(self.other,currentPath,"  10-元以上")
+        # self.doSendStatisticPaper()
 
     def getJingjuNext(self):
         return self.jingju.readOneJinju()
@@ -65,9 +92,9 @@ class SendEmail:
         #前二十的股票提供图片显示
         for item in codes:
             if count>0:
-                imgsOKstr = imgsOKstr + "<p>" + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[3])+"&nbsp;<img src='cid:"+item[0]+"'></p>"
+                imgsOKstr = imgsOKstr + "<p>" + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
             else:
-                imgsOKstr = imgsOKstr + "<p>" + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[3])+"</p>"
+                imgsOKstr = imgsOKstr + "<p>" + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+str(item[5])+"</p>"
             count=count-1
 
         endDate = time.strftime('%Y-%m-%d', time.localtime(time.time()))
@@ -185,9 +212,9 @@ class SendEmail:
     def doSendStatisticForZsm(self):
         query = QueryStock()
         result = query.queryStockYouBrought("zsm=1")
-        self.sendStatistic(result," 回踩反弹-统计")
+        self.sendStatistic(result," 001回踩反弹-统计")
         result = query.queryStockYouBrought("zsm=2")
-        self.sendStatistic(result," 底部吸筹-统计")
+        self.sendStatistic(result," 002底部吸筹-统计")
 
     # 发送邮件
     def sendStatistic(self,result,title):

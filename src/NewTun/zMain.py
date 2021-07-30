@@ -31,7 +31,7 @@ class zMain:
                 os.makedirs(self.currentPath)
         #设置一个默认的图片
         if not os.path.exists(self.currentPath+"\\temp\\zMain.png"):
-            imgHeight=200
+            imgHeight=100
             imgWidth=500
             letterHeight=10
             letterWidth=50
@@ -48,7 +48,7 @@ class zMain:
             font = ImageFont.truetype("C:\\Windows\\Fonts\\Arial.ttf", size=20)
             fg_color = (0, 0, 0)
             drawBrush.text((textX0, textY0), "---zMain---", fill=fg_color, font=font)
-            img.save(self.currentPath+"\\temp\\zMain.png",quality=100)
+            img.save(self.currentPath+"\\temp\\zMain.png",quality=60)
 
     #通过股票数据
     def synHistoryStock(self):
@@ -91,7 +91,7 @@ class zMain:
             count = count + 1
             test = Application()
             if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None:
-                print(str(count) + "     " + item[0]+"     "+item[1]+"    "+item[2]+"    "+item[3])
+                print(str(count) + "\t" + item[0]+"\t"+item[1]+"\t"+item[2]+"\t"+item[3])
             else:
                 continue
             kk = test.execute(item[0])
@@ -156,7 +156,7 @@ s=Statistics()
 if zm.connection.isTest:
     zm.stockShow()
 else:
-    # # #同步历史数据
+    # #同步历史数据
     zm.synHistoryStock()
     # # #扫描选股
     zm.scanStock()

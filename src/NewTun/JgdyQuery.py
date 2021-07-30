@@ -41,11 +41,17 @@ class JgdyQuery:
         # table.field_names = FieldNames
         fundsArray=[]
         # print(len(myData))
+        current=[]
+        i=0
         for data in myData:
             fundsArray = data.split(splitStr)
+            if i<3:
+                current.append(fundsArray)
+                i=i+1
             # print(fundsArray)
             # table.add_row(fundsArray)
             self.save2DB(fundsArray)
+        return current
         # return table
 
     #获取数据
@@ -69,7 +75,7 @@ class JgdyQuery:
         cursor.execute(sql % data)
         if len(list(cursor)) == 0:
             # print(item)
-            sql = "INSERT INTO ajgdy (id, CompanyCode,CompanyName,OrgCode,OrgName,OrgSum,SCode,SName,NoticeDate,StartDate,EndDate,Place,Description,Orgtype,OrgtypeName,Personnel,Licostaff,Maincontent,ChangePercent,Close) " \
+            sql = "INSERT INTO ajgdy (id, CompanyCode,CompanyName,OrgCode,OrgName,OrgSum,SCode,SName,NoticeDate,StartDate,EndDate,Place,Description,Orgtype,OrgtypeName,Personnel,Licostaff,Maincontent,ChangeP,Close) " \
                   "VALUES ( '%s', '%s','%s', '%s','%s', '%s', '%s','%s', '%s','%s','%s', '%s','%s', '%s','%s', '%s', '%s','%s', '%s','%s')"
             data = (uuid.uuid1(), item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7],item[8], item[9], item[10], item[11],item[12], item[13], item[14], item[15],item[16], item[17], item[18])
             cursor.execute(sql % data)
