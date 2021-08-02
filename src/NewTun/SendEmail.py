@@ -25,6 +25,7 @@ class SendEmail:
         query=QueryStock()
         codes=query.queryYouCanBuyStock()
         print(codes)
+
         self.tendown=[]
         self.other=[]
         for item in codes:
@@ -36,34 +37,19 @@ class SendEmail:
             temp.append(item[5])
             temp.append(price)
             temp.append("")   #5
-            temp.append("")   #6
-            temp.append("")   #8
+            temp.append(0)   #6
+            temp.append(item[3])   #7
+
+
+
             if price<=10:
                 self.tendown.append(temp)
             else:
                 self.other.append(temp)
             #主力、散户、反转信号
 
-            jgdy = JgdyQuery()
-            current = jgdy.printJgdyInfo(item[0].split('.')[1], 1)
-            if len(current) > 0:
-                diaoy = '<b>1.机构调研：</b></br>'
-                for z in current:
-                    jgdyDate=z[8]
-                    str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-                    dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
-                    startTime=(dateTime_p + datetime.timedelta(days=-100)).strftime("%Y-%m-%d")
-                    if jgdyDate>startTime:
-                        ztemp = z[8] + "&nbsp;&nbsp;" + z[11] + "&nbsp;&nbsp;" + z[15] + "</br>"
-                        diaoy = diaoy + ztemp
-                if diaoy!='<b>1.机构调研：</b></br>':
-                    temp[5] = diaoy
-                    temp[6]=len(current)
-                else:
-                    temp[6] = 0
-            else:
-                temp[5] = ""
-                temp[6]=0
+            #机构调研
+            self.getJgdy(item,temp)
 
             if item[5]==1:
                 self.Zsm.append(temp)
@@ -81,20 +67,92 @@ class SendEmail:
         # self.doSendStockInfoBeautiful(self.other,currentPath,"  10-元以上")
         # self.doSendStatisticPaper()
 
+        #行业统计
+    def getHytj(self,list):
+        hytj={}
+        hyStock={}
+        for item in list:
+            if hytj.__contains__(item[7]):
+                hytj[item[7]] = int(hytj.get(item[7])) + 1
+                hyStock[item[7]] = hyStock.get(item[7])+","+item[1]+"("+item[0]+")"
+            else:
+                hytj[item[7]] = 1
+                hyStock[item[7]] = item[1]+"("+item[0]+")"
+        hytjResult=[]
+        for hj in sorted(hytj.items(), key=lambda x: x[1], reverse=True):
+            hyTemp=[]
+            hyTemp.append(hj[0])
+            hyTemp.append(str(hj[1]))
+            hyTemp.append(hyStock.get(hj[0]))
+            hytjResult.append(hyTemp)
+        return hytjResult,hyStock,hytj
+    #机构调研
+    def getJgdy(self,item,temp):
+        jgdy = JgdyQuery()
+        current = jgdy.printJgdyInfo(item[0].split('.')[1], 1)
+        if len(current) > 0:
+            diaoy = '<b>1.机构调研：</b></br>'
+            for z in current:
+                jgdyDate = z[8]
+                str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+                startTime = (dateTime_p + datetime.timedelta(days=-100)).strftime("%Y-%m-%d")
+                if jgdyDate > startTime:
+                    ztemp = z[8] + "&nbsp;&nbsp;" + z[11] + "&nbsp;&nbsp;" + z[15] + "</br>"
+                    diaoy = diaoy + ztemp
+            if diaoy != '<b>1.机构调研：</b></br>':
+                temp[5] = diaoy
+                temp[6] = len(current)
+            else:
+                temp[6] = 0
+        else:
+            temp[5] = ""
+            temp[6] = 0
+
+
     def getJingjuNext(self):
         return self.jingju.readOneJinju()
 
     def doSendStockInfoBeautiful(self,codes,currentPath,subject):
         con=Connection()
         myContent="<h4><font color = 'red' > " + self.getJingjuNext() + " </font ></h4></br>"
-        imgsOKstr = myContent+"<p>股票总计："+str(len(codes))
+
+        htmls = myContent + "<h2>1.行业分类(个股数量："+str(len(codes))+")</h2><table border='1'>"
+        htmls = htmls + "<tr><td>行业</td><td>数量</td><td>待选股票</td><td>结论</td></tr>"
+
+        hytjResult,hyStock,hytj=self.getHytj(codes)
+        for row in hytjResult:
+            htmls = htmls + "<tr>"
+            if float(row[1]) >=4:
+                for item in row:
+                    htmls = htmls + "<td bgcolor='#FFCC66'><font color='red' font-size=8px >" + str(item) + "</font></td>"
+                htmls = htmls + "<td bgcolor='#FFCC66'><font color='red' font-size=8px>黑马行业</font></td>"
+            elif float(row[1])==3:
+                for item in row:
+                    htmls = htmls + "<td bgcolor='FFCC66'><font color='orange' font-size=8px>" + str(item) + "</font></td>"
+                htmls = htmls + "<td bgcolor='#FFCC66'><font color='orange' font-size=8px>优势行业</font></td>"
+            else:
+                for item in row:
+                    htmls = htmls + "<td bgcolor='FFCC66'><font color='green' font-size=8px>" + str(item) + "</font></td>"
+                htmls = htmls + "<td bgcolor='#FFCC66'><font color='green' font-size=8px>一般行业</font></td>"
+
+
+            htmls=htmls+"</tr>"
+        htmls=htmls+"</table>"
+        imgsOKstr = htmls+"<h2>2.股票详情</h2><p>"
         count=80
         #前二十的股票提供图片显示
         for item in codes:
+            hy=hytj.get(item[7])
+            myhy=item[7]
+            myhyColor="<font color = 'black' >"
+            if int(hy)>=3:
+                myhy=myhy+"&nbsp;&nbsp;🔺"
+                myhyColor="<font color = 'red' >"
             if count>0:
-                imgsOKstr = imgsOKstr + "<p>" + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
+                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
             else:
-                imgsOKstr = imgsOKstr + "<p>" + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+str(item[5])+"</p>"
+                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+myhy+"</font></br>"+str(item[5])+"</p>"
             count=count-1
 
         endDate = time.strftime('%Y-%m-%d', time.localtime(time.time()))
@@ -221,7 +279,7 @@ class SendEmail:
         successCount=0
         myContent="<h4><font color = 'red' > " + self.getJingjuNext() + " </font ></h4></br>"
         htmls = myContent+"<table border='1'>"
-        htmls=htmls+"<tr><td>代码</td><td>名称</td><td>买入时间</td><td>grad</td><td>cv</td><td>买入价格</td><td>当前价格</td><td>增长幅度100%</td></tr>"
+        htmls=htmls+"<tr><td>代码</td><td>名称</td><td>买入时间</td><td>grad</td><td>cv</td><td>买价</td><td>价格</td><td>增幅100%</td></tr>"
         todayCount=0
         for item in result:
             htmls=htmls+"<tr>"
@@ -232,8 +290,10 @@ class SendEmail:
             for vo in range(len(item)):
                 if float(item[7])>0:
                     htmls=htmls+"<td bgcolor='#FFCC66'><font color='red'>" + str(item[vo]) + "</font></td>"
-                else:
+                elif float(item[7])<0:
                     htmls = htmls + "<td bgcolor='#00FF00'><font color='blue'>" + str(item[vo]) + "</font></td>"
+                else:
+                    htmls = htmls + "<td><font color='red'>" + str(item[vo]) + "</font></td>"
             htmls=htmls+"</tr>"
         htmls=htmls+"</table>"
         totalCount=len(result)-todayCount
