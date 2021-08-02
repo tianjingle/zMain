@@ -91,7 +91,7 @@ class SendEmail:
         jgdy = JgdyQuery()
         current = jgdy.printJgdyInfo(item[0].split('.')[1], 1)
         if len(current) > 0:
-            diaoy = '<b>1.机构调研：</b></br>'
+            diaoy = '<b>1.机构调研：(最近三个月内得机构调研数据)</b></br>'
             for z in current:
                 jgdyDate = z[8]
                 str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -117,7 +117,7 @@ class SendEmail:
         con=Connection()
         myContent="<h4><font color = 'red' > " + self.getJingjuNext() + " </font ></h4></br>"
 
-        htmls = myContent + "<h2>1.行业分类(个股数量："+str(len(codes))+")</h2><table border='1'>"
+        htmls = myContent + "<h2>1.行业分类(个股数量："+str(len(codes))+")，所选股票在行业中聚集，那么很有可能该行业有一波行情！</h2><table border='1'>"
         htmls = htmls + "<tr><td>行业</td><td>数量</td><td>待选股票</td><td>结论</td></tr>"
 
         hytjResult,hyStock,hytj=self.getHytj(codes)
