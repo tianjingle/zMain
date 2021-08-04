@@ -275,3 +275,37 @@ class QueryStock:
         return result
 
 
+    def queryStockForTestJgdy(self,startDate):
+        result=[]
+
+        sql = "select * from candidate_stock where collect_date>'"+startDate+"'"
+        connection = Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset,
+            sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+        )
+        # 获取游标
+        cursor = connect.cursor()
+        # 查询数据
+        cursor.execute(sql)
+        for row in cursor.fetchall():
+            temp=[]
+            temp.append(row[1])
+            temp.append(row[2])
+            temp.append(row[3])
+            temp.append(row[5])
+            temp.append(row[6])
+            temp.append(row[7])
+            temp.append(row[8])
+            temp.append(row[9])
+            # temp.append(row[10])
+            result.append(temp)
+        # 关闭连接
+        cursor.close()
+        connect.close()
+        return result

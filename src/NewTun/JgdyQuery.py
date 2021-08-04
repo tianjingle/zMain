@@ -81,5 +81,34 @@ class JgdyQuery:
             cursor.execute(sql % data)
             connect.commit()
 
+
+    def queryAllByDate(self,startDate):
+        result=[]
+        sql = "select scode,sname,startDate from ajgdy where startdate>'"+startDate+"'"
+        connection = Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset,
+            sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+        )
+        # 获取游标
+        cursor = connect.cursor()
+        # 查询数据
+        cursor.execute(sql)
+        for row in cursor.fetchall():
+            temp=[]
+            temp.append(row[0])
+            temp.append(row[1])
+            temp.append(row[2])
+            result.append(temp)
+        # 关闭连接
+        cursor.close()
+        connect.close()
+        return result
+
 # tianjl = JgdyQuery()
 # tianjl.printJgdyInfo("300232",1)

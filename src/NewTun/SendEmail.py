@@ -271,6 +271,7 @@ class SendEmail:
         query = QueryStock()
         result = query.queryStockYouBrought("zsm=1")
         self.sendStatistic(result," 001回踩反弹-统计")
+        time.sleep(1)
         result = query.queryStockYouBrought("zsm=2")
         self.sendStatistic(result," 002底部吸筹-统计")
 

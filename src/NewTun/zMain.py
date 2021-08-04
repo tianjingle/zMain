@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from src.NewTun.ApplicationWithDraw import ApplicationWithDraw
 from src.NewTun.Connection import Connection
 from src.NewTun.QueryStock import QueryStock
+from src.NewTun.ScanFlag import ScanFlag
 from src.NewTun.SendEmail import SendEmail
 from src.NewTun.Statistics import Statistics
 from src.NewTun.StockInfoSyn import StockInfoSyn
@@ -83,12 +84,25 @@ class zMain:
         print("-----------------------------scan stock------------------------------------")
         print("start time:" + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         syn = StockInfoSyn()
+        scanFlag=ScanFlag()
         basicStock = syn.getBiscicStock()
         count = 0
-        for item in basicStock:
+        allStocklength=len(basicStock)
+        for i in range(allStocklength):
+            item=basicStock[i]
             if item[1].__contains__("ST"):
                 continue
             count = count + 1
+            baseIndex=int(scanFlag.readIndex())
+            if baseIndex<=i:
+                scanFlag.writeIndex(i)
+            elif baseIndex>i:
+                print(item[1]+"\t已扫描...")
+                continue
+
+            if baseIndex==allStocklength-1:
+                scanFlag.writeIndex(0)
+
             test = Application()
             if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None:
                 print(str(count) + "\t" + item[0]+"\t"+item[1]+"\t"+item[2]+"\t"+item[3])
@@ -157,15 +171,15 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # #同步历史数据
-    zm.synHistoryStock()
-    # # #扫描选股
+    # zm.synHistoryStock()
+    # # # #扫描选股
     zm.scanStock()
-    # #股票排名
-    zm.sortByStockGrad()
-    # # #作图
-    zm.stockShow()
-    # #统计股票盈利情况
-    s.statistic()
+    # # #股票排名
+    # zm.sortByStockGrad()
+    # # # #作图
+    # zm.stockShow()
+    # # #统计股票盈利情况
+    # s.statistic()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
 
