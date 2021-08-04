@@ -93,15 +93,15 @@ class zMain:
             if item[1].__contains__("ST"):
                 continue
             count = count + 1
-            baseIndex=int(scanFlag.readIndex())
+            baseIndex=int(scanFlag.readIndex(today))
             if baseIndex<=i:
-                scanFlag.writeIndex(i)
+                scanFlag.writeIndex(today,i)
             elif baseIndex>i:
                 print(item[1]+"\t已扫描...")
                 continue
 
             if baseIndex==allStocklength-1:
-                scanFlag.writeIndex(0)
+                scanFlag.writeIndex(today,0)
 
             test = Application()
             if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None:
@@ -171,15 +171,15 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # #同步历史数据
-    # zm.synHistoryStock()
+    zm.synHistoryStock()
     # # # #扫描选股
     zm.scanStock()
-    # # #股票排名
-    # zm.sortByStockGrad()
+    # #股票排名
+    zm.sortByStockGrad()
     # # # #作图
-    # zm.stockShow()
+    zm.stockShow()
     # # #统计股票盈利情况
-    # s.statistic()
+    s.statistic()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
 
