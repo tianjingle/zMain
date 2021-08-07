@@ -63,6 +63,7 @@ class SendEmail:
         self.doSendStockInfoBeautiful(self.Zsm,currentPath,"\t001回踩反弹")
         self.doSendStockInfoBeautiful(self.GSM,currentPath,"\t002底部吸筹")
         self.doSendStatisticForZsm()
+        self.doSendStatisticForXiChou()
         # self.doSendStockInfoBeautiful(self.tendown,currentPath,"   10+元以内")
         # self.doSendStockInfoBeautiful(self.other,currentPath,"  10-元以上")
         # self.doSendStatisticPaper()
@@ -150,9 +151,10 @@ class SendEmail:
                 myhy=myhy+"&nbsp;&nbsp;🔺"
                 myhyColor="<font color = 'red' >"
             if count>0:
-                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
+                # imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
+                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
             else:
-                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+myhy+"</font></br>"+str(item[5])+"</p>"
+                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
             count=count-1
 
         endDate = time.strftime('%Y-%m-%d', time.localtime(time.time()))
@@ -173,25 +175,25 @@ class SendEmail:
 
         # 指定图片为当前目录
         count = 80
-        for item in codes:
-            if count>0:
-                pngPath=currentPath+'\\temp\\' + item[0] + ".png"
-                if os.path.exists(pngPath):
-                    fp = open(pngPath, 'rb')
-                    msgImage = MIMEImage(fp.read())
-                    fp.close()
-                    temp = "<" + item[0] + ">"
-                    # 定义图片 ID，在 HTML 文本中引用
-                    msgImage.add_header('Content-ID', temp)
-                else:
-                    fp = open(currentPath+"\\temp\\zMain.png", 'rb')
-                    msgImage = MIMEImage(fp.read())
-                    fp.close()
-                    temp = "<" + item[0] + ">"
-                    # 定义图片 ID，在 HTML 文本中引用
-                    msgImage.add_header('Content-ID', temp)
-                msgRoot.attach(msgImage)
-            count=count-1
+        # for item in codes:
+        #     if count>0:
+        #         pngPath=currentPath+'\\temp\\' + item[0] + ".png"
+        #         if os.path.exists(pngPath):
+        #             fp = open(pngPath, 'rb')
+        #             msgImage = MIMEImage(fp.read())
+        #             fp.close()
+        #             temp = "<" + item[0] + ">"
+        #             # 定义图片 ID，在 HTML 文本中引用
+        #             msgImage.add_header('Content-ID', temp)
+        #         else:
+        #             fp = open(currentPath+"\\temp\\zMain.png", 'rb')
+        #             msgImage = MIMEImage(fp.read())
+        #             fp.close()
+        #             temp = "<" + item[0] + ">"
+        #             # 定义图片 ID，在 HTML 文本中引用
+        #             msgImage.add_header('Content-ID', temp)
+        #         msgRoot.attach(msgImage)
+        #     count=count-1
         try:
             users=receivers.split(',')
             for item in users:
@@ -271,7 +273,9 @@ class SendEmail:
         query = QueryStock()
         result = query.queryStockYouBrought("zsm=1")
         self.sendStatistic(result," 001回踩反弹-统计")
-        time.sleep(1)
+
+    def doSendStatisticForXiChou(self):
+        query = QueryStock()
         result = query.queryStockYouBrought("zsm=2")
         self.sendStatistic(result," 002底部吸筹-统计")
 
@@ -326,6 +330,7 @@ class SendEmail:
             print("邮件发送成功")
         except smtplib.SMTPException:
             print("Error: 无法发送邮件")
+            print(smtplib.SMTPException)
 
 
 
