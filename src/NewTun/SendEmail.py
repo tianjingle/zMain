@@ -271,12 +271,12 @@ class SendEmail:
     def doSendStatisticForZsm(self):
         query = QueryStock()
         result = query.queryStockYouBrought("zsm=1")
-        self.sendStatistic(result," 001回踩反弹-统计")
+        self.sendStatistic(result," 001回踩反弹-统计（胜率较高，但是需要对筹码有一定的了解，底部筹码没有松动，可入，否则逃吧）")
 
     def doSendStatisticForXiChou(self):
         query = QueryStock()
         result = query.queryStockYouBrought("zsm=2")
-        self.sendStatistic(result," 002底部吸筹-统计")
+        self.sendStatistic(result," 002底部吸筹-统计（此策略，尖子生太少，中坚力量太弱，垃圾股太多，还没有优化！！）")
 
     # 发送邮件
     def sendStatistic(self,result,title):
