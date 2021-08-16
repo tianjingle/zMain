@@ -275,10 +275,8 @@ class QueryStock:
         return result
 
 
-    def queryStockForTestJgdy(self,startDate):
+    def queryStockForTestJgdy(self,sql):
         result=[]
-
-        sql = "select * from candidate_stock where collect_date>'"+startDate+"'"
         connection = Connection()
         connect = pymysql.Connect(
             host=connection.host,
@@ -303,7 +301,7 @@ class QueryStock:
             temp.append(row[7])
             temp.append(row[8])
             temp.append(row[9])
-            # temp.append(row[10])
+            temp.append(row[10])
             result.append(temp)
         # 关闭连接
         cursor.close()

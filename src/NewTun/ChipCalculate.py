@@ -89,12 +89,19 @@ class ChipCalculate:
             csdnTemp.append(TtodayChouma)
             csdnTemp.append("")
             csdnTemp.append(TTmax)
+            t=0
             if currentPrice*100>maxVolprice:
                 #当前的价格大于筹码的平均价格
+                t=1
+            else:
+                t=0
+            csdnTemp.append(t)
+            csdnTemp.append(myUp)
+
+            if csdn * 100 >= maxVolprice and t==1:
                 csdnTemp.append(1)
             else:
                 csdnTemp.append(0)
-            csdnTemp.append(myUp)
             result.append(csdnTemp)
         return result
 

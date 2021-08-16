@@ -118,6 +118,7 @@ class Application:
         #最后一天得价格是否大于筹码峰
         bigVolPriceLastOne=resultEnd[len(resultEnd)-1][5]
         myUp=resultEnd[len(resultEnd)-1][6]
+        sanJx=resultEnd[len(resultEnd)-1][7]
         print(bigVolPriceLastOne)
 
 
@@ -142,7 +143,7 @@ class Application:
         #散户、主力、反转信号
         # print("z="+str(z)+"\ts="+str(s)+"\tm="+str(m)+"\tp>c="+str(resultEnd[len(resultEnd)-1][5]))
         zsmFlag=self.zsmIndexCalculate(z,s,m,resultEnd[len(resultEnd)-1])
-        if zsmFlag==1:
+        if zsmFlag==1 and sanJx==1:
             self.isZsm=1
 
 
@@ -168,7 +169,7 @@ class Application:
                             self.isDownLine=1
                         else:
                             self.isDownLine=0
-                        if bigVolPriceLastOne == 1 and myUp==1:
+                        if bigVolPriceLastOne == 1 and myUp==1 and sanJx==1:
                             self.isZsm = 2
                         print(self.currentPrice)
                         print(self.maxPrice)

@@ -41,7 +41,6 @@ class SendEmail:
             temp.append(item[3])   #7
 
 
-
             if price<=10:
                 self.tendown.append(temp)
             else:
@@ -49,7 +48,7 @@ class SendEmail:
             #主力、散户、反转信号
 
             #机构调研
-            self.getJgdy(item,temp)
+            # self.getJgdy(item,temp)
 
             if item[5]==1:
                 self.Zsm.append(temp)
@@ -60,8 +59,8 @@ class SendEmail:
         self.other=sorted(self.other, key=lambda s: s[2],reverse=False)
         self.Zsm=sorted(self.Zsm, key=lambda s: s[6],reverse=True)
         self.GSM=sorted(self.GSM, key=lambda s: s[6],reverse=True)
-        self.doSendStockInfoBeautiful(self.Zsm,currentPath,"\t001回踩反弹")
-        self.doSendStockInfoBeautiful(self.GSM,currentPath,"\t002底部吸筹")
+        self.doSendStockInfoBeautiful(self.Zsm,currentPath,"\t001 回踩反弹（莫追高，高处不胜寒，电闪雷鸣，一朝泥石流！！全部死翘翘！）")
+        self.doSendStockInfoBeautiful(self.GSM,currentPath,"\t002 底部吸筹(抄底抄到半山腰，泪两行，股市永远没有底！！)")
         self.doSendStatisticForZsm()
         self.doSendStatisticForXiChou()
         # self.doSendStockInfoBeautiful(self.tendown,currentPath,"   10+元以内")
