@@ -1,5 +1,6 @@
 import datetime
 import time
+import threadpool
 
 import pymysql.cursors
 from src.NewTun.Connection import Connection
@@ -55,6 +56,57 @@ class StockInfoSyn:
         connect.close()
         return stockList
 
+    def doSyn(self,i,stockTemp,endTime):
+        # 获取游标
+        connection = Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset
+        )
+        cursor = connect.cursor()
+        startTime = ''
+        for row in stockTemp:
+            isToady = False
+            print("thread-" + str(i) +" - " + row)
+            realCode = self.tuShareCode2BaoStockCode(row)
+            tableCheckSql = "show tables like '" + realCode + "'"
+            cursor.execute(tableCheckSql)
+            if len(list(cursor)) == 0:
+                print("no data of " + realCode)
+                startTime = '2015-01-01'
+            else:
+                # 查找股票的最近时间
+                sql = "SELECT * FROM `%s` order by date desc limit 1;"
+                data = (realCode)
+                cursor.execute(sql % data)
+                # 如果没有数据那么设置为1997年开始
+                for row in cursor.fetchall():
+                    startTime1 = row[0]
+                    if startTime1 == endTime:
+                        isToady = True
+                        continue
+                    str_p = startTime1 + ' 0:29:08'
+                    dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+                    startTime = (dateTime_p + datetime.timedelta(days=+1)).strftime("%Y-%m-%d")
+            if isToady == True:
+                print(realCode + "--不需要同步了。。")
+            else:
+                print("syn  " + realCode)
+                fectExecute = StockFetch()
+                # 优先从通达信获取数据
+                if connection.tdxDayPath == '':
+                    fectExecute.fetchByStartAndEndTime(realCode, startTime, endTime)
+                else:
+                    fectExecute.parseDataFromCvs(connection.tdxDayPath, realCode, startTime, endTime)
+            if self.isJgdy == 'True':
+                jgdy = JgdyQuery()
+                jgdy.printJgdyInfo(realCode.split('.')[1], 1)
+
+
     def synStockInfo(self):
         # 获取游标
         connection=Connection()
@@ -69,44 +121,38 @@ class StockInfoSyn:
         cursor = connect.cursor()
         allStockBasic='select * from stock_basic'
         cursor.execute(allStockBasic)
-        startTime=''
         endTime=time.strftime('%Y-%m-%d',time.localtime(time.time()))
-        isToady=False
+
+        stockCodeList1=[]
+        stockCodeList2=[]
+        stockCodeList3=[]
+        stockCodeList4=[]
+        stockCodeList=[]
+
+        i=0
         for row in cursor.fetchall():
-            isToady=False
-            print(row[0])
-            realCode=self.tuShareCode2BaoStockCode(row[0])
-            tableCheckSql = "show tables like '"+realCode+"'"
-            cursor.execute(tableCheckSql)
-            if len(list(cursor))==0:
-                print("no data of "+realCode)
-                startTime='2015-01-01'
+            stockCodeList.append(row[0])
+            if i<1000:
+                stockCodeList1.append(row[0])
+            elif i>=1000 and i<2000:
+                stockCodeList2.append(row[0])
+            elif i>=2000 and i<3000:
+                stockCodeList3.append(row[0])
             else:
-                # 查找股票的最近时间
-                sql = "SELECT * FROM `%s` order by date desc limit 1;"
-                data = (realCode)
-                cursor.execute(sql % data)
-                #如果没有数据那么设置为1997年开始
-                for row in cursor.fetchall():
-                    startTime1=row[0]
-                    if startTime1==endTime:
-                        isToady=True
-                        continue
-                    str_p = startTime1+' 0:29:08'
-                    dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
-                    startTime=(dateTime_p + datetime.timedelta(days=+1)).strftime("%Y-%m-%d")
-            if isToady==True:
-                print(realCode + "--不需要同步了。。")
-            else:
-                print("syn  "+realCode)
-                fectExecute= StockFetch()
-                #优先从通达信获取数据
-                if connection.tdxDayPath=='':
-                    fectExecute.fetchByStartAndEndTime(realCode,startTime,endTime)
-                else:
-                    fectExecute.parseDataFromCvs(connection.tdxDayPath,realCode,startTime,endTime)
-            if self.isJgdy=='True':
-                jgdy = JgdyQuery()
-                jgdy.printJgdyInfo(realCode.split('.')[1], 1)
+                stockCodeList4.append(row[0])
+            i=i+1
+        pool = threadpool.ThreadPool(4)
+        dict_vars = {'i': 1, 'stockTemp': stockCodeList, 'endTime': endTime}
+        dict_vars_1 = {'i': 1, 'stockTemp': stockCodeList1, 'endTime': endTime}
+        dict_vars_2 = {'i': 2, 'stockTemp': stockCodeList2, 'endTime': endTime}
+        dict_vars_3 = {'i': 3, 'stockTemp': stockCodeList3, 'endTime': endTime}
+        dict_vars_4 = {'i': 4, 'stockTemp': stockCodeList4, 'endTime': endTime}
+        func_var = [(None, dict_vars_1),(None, dict_vars_2),(None, dict_vars_3),(None, dict_vars_4)]
+        func_var = [(None, dict_vars)]
+        requests = threadpool.makeRequests(self.doSyn, func_var)
+        for req in requests:
+            pool.putRequest(req)
+        pool.wait()
+        print("--------------syn---------end....")
         cursor.close()
         connect.close()

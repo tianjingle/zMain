@@ -132,7 +132,10 @@ class ChipCalculate:
                 # 如果已经包含了当前价格，那么就进行累加
                 if self.price_vol.__contains__(key):
                     volTemp = self.price_vol.get(key)
-                    volTemp = volTemp + everyMao
+                    if volTemp!=None:
+                        volTemp = volTemp + everyMao
+                    else:
+                        volTemp=0
                     self.price_vol[key] = volTemp
                 else:
                     # 当前价格上的筹码量

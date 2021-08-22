@@ -2,6 +2,7 @@ import time
 import os
 import uuid
 import pymysql
+import threadpool
 from PIL import Image, ImageDraw, ImageFont
 
 from src.NewTun.ApplicationWithDraw import ApplicationWithDraw
@@ -62,55 +63,30 @@ class zMain:
             print("start time:"+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
 
 
-    # #扫描潜在可以投资的股票
-    def scanStock(self):
-        query = QueryStock()
-        today=query.todayIsTrue()[0]
-        connect = pymysql.Connect(
-            host=self.connection.host,
-            port=self.connection.port,
-            user=self.connection.user,
-            passwd=self.connection.passwd,
-            db=self.connection.db,
-            charset=self.connection.charset
-        )
-        # 获取游标
-        cursor = connect.cursor()
-        tableCheckSql = "show tables like 'candidate_stock'"
-        cursor.execute(tableCheckSql)
-        if len(list(cursor)) == 0:
-            createTable = "create table candidate_stock(id varchar(64) primary key not null,code varchar(64),name varchar(64),collect_date varchar(64),industry varchar(64),grad float,cv float,price float,now_price float,profit float,other varchar(45),is_down_line int,zsm int)"
-            cursor.execute(createTable)
-        print("-----------------------------scan stock------------------------------------")
-        print("start time:" + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
-        syn = StockInfoSyn()
+    def doScan(self,t,stockLength,basicStock,today,cursor,connect):
+        allStocklength=stockLength
         scanFlag=ScanFlag()
-        basicStock = syn.getBiscicStock()
-        count = 0
-        allStocklength=len(basicStock)
         for i in range(allStocklength):
             item=basicStock[i]
             if item[1].__contains__("ST"):
                 continue
-            count = count + 1
-            baseIndex=int(scanFlag.readIndex(today))
+            baseIndex=int(scanFlag.readIndex(t,today))
             if baseIndex<=i:
-                scanFlag.writeIndex(today,i)
+                scanFlag.writeIndex(t,today,i)
             elif baseIndex>i:
-                print(item[1]+"\t已扫描...")
+                print("thread"+str(t)+"\t"+item[1]+"\t已扫描...")
                 continue
-
             if baseIndex==allStocklength-1:
-                scanFlag.writeIndex(today,0)
+                scanFlag.writeIndex(t,today,0)
 
             test = Application()
             if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None:
-                print(str(count) + "\t" + item[0]+"\t"+item[1]+"\t"+item[2]+"\t"+item[3])
+                print("thread-"+str(t)+"\t"+item[0]+"\t"+item[1]+"\t"+item[2]+"\t"+item[3])
             else:
                 continue
             kk = test.execute(item[0])
             if kk.isZsm==1:
-                print("--------主力、散户、反转信号出现------")
+                print("thread"+str(t)+"\t--------主力、散户、反转信号出现------")
                 print(item[0]+"---"+item[1])
             elif kk.isZsm==2:
                 print("up")
@@ -140,9 +116,69 @@ class zMain:
                 connect.commit()
             # 垃圾回收
             del kk, test
-            if count == int(self.connection.scans):
-                print("测试退出")
-                break
+
+
+
+    # #扫描潜在可以投资的股票
+    def scanStock(self):
+        query = QueryStock()
+        today=query.todayIsTrue()[0]
+        connect = pymysql.Connect(
+            host=self.connection.host,
+            port=self.connection.port,
+            user=self.connection.user,
+            passwd=self.connection.passwd,
+            db=self.connection.db,
+            charset=self.connection.charset
+        )
+        # 获取游标
+        cursor = connect.cursor()
+        tableCheckSql = "show tables like 'candidate_stock'"
+        cursor.execute(tableCheckSql)
+        if len(list(cursor)) == 0:
+            createTable = "create table candidate_stock(id varchar(64) primary key not null,code varchar(64),name varchar(64),collect_date varchar(64),industry varchar(64),grad float,cv float,price float,now_price float,profit float,other varchar(45),is_down_line int,zsm int)"
+            cursor.execute(createTable)
+        print("-----------------------------scan stock------------------------------------")
+        print("start time:" + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        syn = StockInfoSyn()
+        basicStock = syn.getBiscicStock()
+        allStocklength=len(basicStock)
+        stockCodeList1=[]
+        stockCodeList2=[]
+        stockCodeList3=[]
+        stockCodeList4=[]
+        stockCodeList=[]
+
+        i=0
+        for j in range(allStocklength):
+            item = basicStock[j]
+            stockCodeList.append(item)
+            if i<1000:
+                stockCodeList1.append(item)
+            elif i>=1000 and i<2000:
+                stockCodeList2.append(item)
+            elif i>=2000 and i<3000:
+                stockCodeList3.append(item)
+            else:
+                stockCodeList4.append(item)
+            i=i+1
+
+        pool = threadpool.ThreadPool(4)
+        # t, stockLength, basicStock, scanFlag, today, cursor, connect
+        dict_vars_1 = {'t': 1, 'stockLength':len(stockCodeList1),'basicStock': stockCodeList1,'today':today,'cursor':cursor,'connect':connect}
+        dict_vars_2 = {'t': 2, 'stockLength':len(stockCodeList2),'basicStock': stockCodeList2,'today':today,'cursor':cursor,'connect':connect}
+        dict_vars_3 = {'t': 3, 'stockLength':len(stockCodeList3), 'basicStock':stockCodeList3,'today':today,'cursor':cursor,'connect':connect}
+        dict_vars_4 = {'t': 4, 'stockLength':len(stockCodeList4), 'basicStock':stockCodeList4,'today':today,'cursor':cursor,'connect':connect}
+        func_var = [(None, dict_vars_1),(None, dict_vars_2),(None, dict_vars_3),(None, dict_vars_4)]
+        # requests = threadpool.makeRequests(self.doScan, func_var)
+        # for req in requests:
+        #     pool.putRequest(req)
+        self.doScan(1,len(stockCodeList),stockCodeList,today,cursor,connect)
+        print("xi")
+        pool.wait()
+        print("-----扫描结束-----")
+
+
 
     #按照程度的梯度排序
     def sortByStockGrad(self):
@@ -171,13 +207,13 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # 同步历史数据
-    zm.synHistoryStock()
+    # zm.synHistoryStock()
     # # # #扫描选股
     zm.scanStock()
     # #股票排名
     zm.sortByStockGrad()
-    # # # #作图
-    # zm.stockShow()
+    # # #作图
+    zm.stockShow()
     #统计股票盈利情况
     s.statistic()
     # 分类股票推荐发送

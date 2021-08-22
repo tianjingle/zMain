@@ -1,4 +1,5 @@
 import math
+import threading
 
 import pandas as pd
 import talib
@@ -106,7 +107,10 @@ class Application:
             wangYSlow.append(kk1)
         yijieSlowdict = dict(zip(wangXSlow, wangYSlow))
         # 筹码计算
+        # lock = threading.Lock()  # 申请一把锁
+        # lock.acquire()
         resultEnd = self.chipCalculate(result, self.queryStock.start,False)
+        # lock.release()
         choumaList=np.array(resultEnd[2][2])
         x = []
         p = []
