@@ -1,10 +1,10 @@
 # zMain
 
-[个人学习]:整合baostack、tushare天天基金等数据源，筹码计算，多阶导数计算，k线绘制，智能选股和邮件提醒，机构调研数据获取等。
+[个人学习]:123。
 
 
-整合baostack、tushare天天基金等数据源，筹码计算，多阶导数计算，k线绘制，智能选股和邮件提醒，机构调研数据获取等。目前做了zMain，后期做sMain、tMain，分别专注于选股，波段，做T。欢迎一起探讨财务自由之路。
-- 量化策略合作：QQ：2695062879
+
+- 合作：QQ：2695062879
 
 
 ![zMain效果图](src/NewTun/temp/sh.600059.png)
@@ -179,7 +179,7 @@ passwd=tianjingle   #密码
 db=noun   #数据库名称，需要提前创建
 charset=utf8
 [Email]
-pass=tmugmrbimrcddead   #邮件密码，这是我申请的，您可以自己申请一个
+pass=213213123   #邮件密码，这是我申请的，您可以自己申请一个
 user=2695062879@qq.com   #邮件密码关联的用户邮箱
 sender=2695062879@qq.com   #发邮件的用户邮箱
 receiver=2695062879@qq.com   #接受人的邮箱，多人用，号隔开
