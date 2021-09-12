@@ -30,7 +30,7 @@ class zMain:
         if self.connection.savePath!='':
             self.currentPath=self.connection.savePath
             if not os.path.exists(self.currentPath+"\\temp\\"):
-                os.makedirs(self.currentPath)
+                os.makedirs(self.currentPath+"\\temp\\")
         #设置一个默认的图片
         if not os.path.exists(self.currentPath+"\\temp\\zMain.png"):
             imgHeight=100
@@ -90,6 +90,11 @@ class zMain:
                 print(item[0]+"---"+item[1])
             elif kk.isZsm==2:
                 print("up")
+            elif kk.isZsm==3:
+                test.avgCostGrad=-1
+                print("通达信买点")
+            else:
+                continue
 
             if test.avgCostGrad < 0 or kk.isZsm>=1:
                 candidateTemp = []
@@ -208,15 +213,15 @@ if zm.connection.isTest:
 else:
     # 同步历史数据
     # zm.synHistoryStock()
-    # # # #扫描选股
+    # # #扫描选股
     zm.scanStock()
-    # #股票排名
-    zm.sortByStockGrad()
-    # # #作图
-    zm.stockShow()
+    #股票排名
+    # zm.sortByStockGrad()
+    # #作图
+    # zm.stockShow()
     #统计股票盈利情况
     s.statistic()
     # 分类股票推荐发送
-    sendEmail.sendYouCanBuy(zm.currentPath)
+    # sendEmail.sendYouCanBuy(zm.currentPath)
 
 

@@ -85,7 +85,13 @@ class Application:
         result=self.queryStock.queryStock(code)
         if len(result[0])<200:
             return self
-        return self.core(result[0],result[1])
+        if result[2]>0:
+            print("通达信买点...")
+            self.isZsm=3
+            return self
+        else:
+            return self
+        #return self.core(result[0],result[1])
 
 
     #核心调度器

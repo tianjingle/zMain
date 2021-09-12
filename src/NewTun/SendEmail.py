@@ -150,8 +150,8 @@ class SendEmail:
                 myhy=myhy+"&nbsp;&nbsp;🔺"
                 myhyColor="<font color = 'red' >"
             if count>0:
-                # imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
-                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
+                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
+                # imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
             else:
                 imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
             count=count-1
@@ -174,25 +174,25 @@ class SendEmail:
 
         # 指定图片为当前目录
         count = 80
-        # for item in codes:
-        #     if count>0:
-        #         pngPath=currentPath+'\\temp\\' + item[0] + ".png"
-        #         if os.path.exists(pngPath):
-        #             fp = open(pngPath, 'rb')
-        #             msgImage = MIMEImage(fp.read())
-        #             fp.close()
-        #             temp = "<" + item[0] + ">"
-        #             # 定义图片 ID，在 HTML 文本中引用
-        #             msgImage.add_header('Content-ID', temp)
-        #         else:
-        #             fp = open(currentPath+"\\temp\\zMain.png", 'rb')
-        #             msgImage = MIMEImage(fp.read())
-        #             fp.close()
-        #             temp = "<" + item[0] + ">"
-        #             # 定义图片 ID，在 HTML 文本中引用
-        #             msgImage.add_header('Content-ID', temp)
-        #         msgRoot.attach(msgImage)
-        #     count=count-1
+        for item in codes:
+            if count>0:
+                pngPath=currentPath+'\\temp\\' + item[0] + ".png"
+                if os.path.exists(pngPath):
+                    fp = open(pngPath, 'rb')
+                    msgImage = MIMEImage(fp.read())
+                    fp.close()
+                    temp = "<" + item[0] + ">"
+                    # 定义图片 ID，在 HTML 文本中引用
+                    msgImage.add_header('Content-ID', temp)
+                else:
+                    fp = open(currentPath+"\\temp\\zMain.png", 'rb')
+                    msgImage = MIMEImage(fp.read())
+                    fp.close()
+                    temp = "<" + item[0] + ">"
+                    # 定义图片 ID，在 HTML 文本中引用
+                    msgImage.add_header('Content-ID', temp)
+                msgRoot.attach(msgImage)
+            count=count-1
         try:
             users=receivers.split(',')
             for item in users:
