@@ -190,6 +190,11 @@ class Application:
             return 1
         return 0
 
+    def executeForBc(self, code):
+        result = self.queryStock.queryStock(code)
+        if len(result[0]) < 200:
+            return self
+
 
 
 

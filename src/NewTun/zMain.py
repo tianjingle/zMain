@@ -136,7 +136,7 @@ class zMain:
         tableCheckSql = "show tables like 'candidate_stock'"
         cursor.execute(tableCheckSql)
         if len(list(cursor)) == 0:
-            createTable = "create table candidate_stock(id varchar(64) primary key not null,code varchar(64),name varchar(64),collect_date varchar(64),industry varchar(64),grad float,cv float,price float,now_price float,profit float,other varchar(45),is_down_line int,zsm int)"
+            createTable = "create table candidate_stock(id varchar(64) primary key not null,code varchar(64),name varchar(64),collect_date varchar(64),industry varchar(64),grad float,cv float,price float,now_price float,profit float,other varchar(45),is_down_line int,zsm int,dl int)"
             cursor.execute(createTable)
         print("-----------------------------scan stock------------------------------------")
         print("start time:" + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
@@ -197,6 +197,33 @@ class zMain:
                 test.execute(item[0],True,self.currentPath)
                 print(str(item[1])+"   "+item[0]+"   "+str(item[3]))
 
+    def huiBu(self):
+        query = QueryStock()
+        connect = pymysql.Connect(
+            host=self.connection.host,
+            port=self.connection.port,
+            user=self.connection.user,
+            passwd=self.connection.passwd,
+            db=self.connection.db,
+            charset=self.connection.charset
+        )
+        # 获取游标
+        cursor = connect.cursor()
+        today = query.todayIsTrue()[0]
+        codes=query.queryStock20DayReccently()
+        for i in range(codes):
+            test = Application()
+            kk = test.executeForBc(codes[i][0])
+            if kk.isZsm==3:
+                # 开始修正
+                print(codes[i][0]+"---补充修正3..."+codes[i][1])
+                sql = "update candidate_stock set zsm=" + str(kk.isZsm) + " where collect_date='" + today + "' and code='" + codes[i][0] + "' and id!=''"
+                print(sql)
+                cursor.execute(sql)
+                connect.commit()
+            # 垃圾回收
+            del kk, test
+        pass
 
 
 zm=zMain()
@@ -216,6 +243,8 @@ else:
     zm.stockShow()
     #统计股票盈利情况
     s.statistic()
+
+    zm.huiBu()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
 

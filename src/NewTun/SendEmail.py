@@ -48,7 +48,7 @@ class SendEmail:
             #主力、散户、反转信号
 
             #机构调研
-            # self.getJgdy(item,temp)
+            self.getJgdy(item,temp)
 
             if item[5]==1:
                 self.Zsm.append(temp)
