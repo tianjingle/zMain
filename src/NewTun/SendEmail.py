@@ -26,6 +26,11 @@ class SendEmail:
         codes=query.queryYouCanBuyStock()
         print(codes)
 
+
+        bc=query.queryStockBC()
+        print(bc)
+        codes=codes+bc
+
         self.tendown=[]
         self.other=[]
         for item in codes:
@@ -39,16 +44,17 @@ class SendEmail:
             temp.append("")   #5
             temp.append(0)   #6
             temp.append(item[3])   #7
+            temp.append(item[6])   #8
 
 
-            if price<=10:
-                self.tendown.append(temp)
-            else:
-                self.other.append(temp)
+            # if price<=10:
+            #     self.tendown.append(temp)
+            # else:
+            #     self.other.append(temp)
             #主力、散户、反转信号
 
             #机构调研
-            self.getJgdy(item,temp)
+            # self.getJgdy(item,temp)
 
             if item[5]==1:
                 self.Zsm.append(temp)
@@ -74,10 +80,16 @@ class SendEmail:
         for item in list:
             if hytj.__contains__(item[7]):
                 hytj[item[7]] = int(hytj.get(item[7])) + 1
-                hyStock[item[7]] = hyStock.get(item[7])+","+item[1]+"("+item[0]+")"
+                if(int(item[8])==1):
+                    hyStock[item[7]] = hyStock.get(item[7]) + ",[地]" + item[1] + "(" + item[0] + ")"
+                else:
+                    hyStock[item[7]] = hyStock.get(item[7])+","+item[1]+"("+item[0]+")"
             else:
                 hytj[item[7]] = 1
-                hyStock[item[7]] = item[1]+"("+item[0]+")"
+                if(int(item[8])==1):
+                    hyStock[item[7]] = "[地]" + item[1] + "(" + item[0] + ")"
+                else:
+                    hyStock[item[7]] = item[1]+"("+item[0]+")"
         hytjResult=[]
         for hj in sorted(hytj.items(), key=lambda x: x[1], reverse=True):
             hyTemp=[]

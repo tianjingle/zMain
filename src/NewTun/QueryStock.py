@@ -162,6 +162,7 @@ class QueryStock:
             temp.append(row[5])
             #主力、散户、反转
             temp.append(row[12])
+            temp.append(0)
             codes.append(temp)
         # 关闭连接
         cursor.close()
@@ -386,7 +387,7 @@ class QueryStock:
         dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
         startTime = (dateTime_p + datetime.timedelta(days=-20)).strftime("%Y-%m-%d")
         # 查询数据
-        sql = "SELECT * FROM `candidate_stock` where zsm=1 and collect_date>'%s' order by cv asc,grad desc"
+        sql = "SELECT distinct * FROM `candidate_stock` where zsm=2 and collect_date>'%s' order by cv asc,grad desc"
         data = (startTime)
         cursor.execute(sql % data)
         for row in cursor.fetchall():
@@ -398,6 +399,44 @@ class QueryStock:
             temp.append(row[5])
             #主力、散户、反转
             temp.append(row[12])
+            codes.append(temp)
+        # 关闭连接
+        cursor.close()
+        connect.close()
+        return codes
+
+    def queryStockBC(self):
+        str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+        startTime = (dateTime_p + datetime.timedelta(days=-20)).strftime("%Y-%m-%d")
+
+        # 连接数据库
+        codes = []
+        connection = Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset,
+            sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+        )
+        cursor = connect.cursor()
+        # 查询数据
+        sql = "select a.* from candidate_stock a inner join (SELECT id,code,min(collect_date),profit from candidate_stock where  collect_date>'%s' and dl=1 group by code order by profit desc) b where a.id=b.id"
+        data = (startTime)
+        cursor.execute(sql % data)
+        for row in cursor.fetchall():
+            temp = []
+            temp.append(row[1])
+            temp.append(row[2])
+            temp.append(row[3])
+            temp.append(row[4])
+            temp.append(row[5])
+            # 主力、散户、反转
+            temp.append(row[12])
+            temp.append(1)
             codes.append(temp)
         # 关闭连接
         cursor.close()

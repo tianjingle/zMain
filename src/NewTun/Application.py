@@ -190,11 +190,15 @@ class Application:
             return 1
         return 0
 
+    #补充买点
     def executeForBc(self, code):
         result = self.queryStock.queryStock(code)
         if len(result[0]) < 200:
             return self
-
+        if result[2]>0:
+            self.isZsm=3
+            return self
+        return self
 
 
 

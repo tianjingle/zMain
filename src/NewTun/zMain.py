@@ -211,13 +211,13 @@ class zMain:
         cursor = connect.cursor()
         today = query.todayIsTrue()[0]
         codes=query.queryStock20DayReccently()
-        for i in range(codes):
+        for i in range(len(codes)):
             test = Application()
             kk = test.executeForBc(codes[i][0])
             if kk.isZsm==3:
                 # 开始修正
                 print(codes[i][0]+"---补充修正3..."+codes[i][1])
-                sql = "update candidate_stock set zsm=" + str(kk.isZsm) + " where collect_date='" + today + "' and code='" + codes[i][0] + "' and id!=''"
+                sql = "update candidate_stock set dl=1 where collect_date='" + codes[i][2] + "' and code='" + codes[i][0] + "' and id!=''"
                 print(sql)
                 cursor.execute(sql)
                 connect.commit()
@@ -234,7 +234,7 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # 同步历史数据
-    # zm.synHistoryStock()
+    zm.synHistoryStock()
     # # # #扫描选股
     zm.scanStock()
     # #股票排名
@@ -243,7 +243,7 @@ else:
     zm.stockShow()
     #统计股票盈利情况
     s.statistic()
-
+    #回防
     zm.huiBu()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
