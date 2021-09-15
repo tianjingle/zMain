@@ -282,13 +282,19 @@ class SendEmail:
     #回踩反弹策略历史统计
     def doSendStatisticForZsm(self):
         query = QueryStock()
-        result = query.queryStockYouBrought("zsm=1")
-        self.sendStatistic(result," 001回踩反弹-统计（胜率较高，但是需要对筹码有一定的了解，底部筹码没有松动，可入，否则逃吧）")
+        str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+        startTime = (dateTime_p + datetime.timedelta(days=-60)).strftime("%Y-%m-%d")
+        result = query.queryStockYouBrought("zsm=1 and collect_date>'"+startTime+"'")
+        self.sendStatistic(result," 00【统计】1 回踩反弹策略最近60天-统计（胜率较高，但是需要对筹码有一定的了解，底部筹码没有松动，可入，否则逃吧）")
 
     def doSendStatisticForXiChou(self):
         query = QueryStock()
-        result = query.queryStockYouBrought("zsm=2")
-        self.sendStatistic(result," 002底部吸筹-统计（此策略，尖子生太少，中坚力量太弱，垃圾股太多，还没有优化！！）")
+        str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+        startTime = (dateTime_p + datetime.timedelta(days=-60)).strftime("%Y-%m-%d")
+        result = query.queryStockYouBrought("zsm=2 and collect_date>'"+startTime+"'")
+        self.sendStatistic(result," 002【统计】 底部吸筹策略最近60天-统计（此策略，尖子生太少，中坚力量太弱，垃圾股太多，还没有优化！！）")
 
     # 发送邮件
     def sendStatistic(self,result,title):
