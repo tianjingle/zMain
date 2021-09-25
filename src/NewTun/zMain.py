@@ -225,6 +225,47 @@ class zMain:
             del kk, test
         pass
 
+    #突然觉醒
+    def soul(self):
+        query = QueryStock()
+        today = query.todayIsTrue()[0]
+        connect = pymysql.Connect(
+            host=self.connection.host,
+            port=self.connection.port,
+            user=self.connection.user,
+            passwd=self.connection.passwd,
+            db=self.connection.db,
+            charset=self.connection.charset
+        )
+        # 获取游标
+        cursor = connect.cursor()
+        print("-----------------------------scan soul stock------------------------------------")
+        print("start time:" + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        syn = StockInfoSyn()
+        basicStock = syn.getBiscicStock()
+        for i in range(len(basicStock)):
+            item = basicStock[i]
+            if item[1].__contains__("ST"):
+                continue
+            test = Application()
+            kk = test.executeForBc(basicStock[i][0])
+            if kk.isZsm == 3:
+                # 插入数据
+                sql = "select * from candidate_stock where code='%s' and collect_date='%s'"
+                data = (item[0], today)
+                cursor.execute(sql % data)
+                if len(list(cursor)) == 0:
+                    print(item)
+                    sql = "INSERT INTO candidate_stock (id, code, name,collect_date,industry,grad,cv,is_down_line,zsm) VALUES ( '%s', '%s','%s', '%s','%s', %.8f, %.8f,%i,%i)"
+                    data = (uuid.uuid1(), item[0], item[1], today, item[3], test.avgCostGrad, abs(test.cvValue),
+                            test.isDownLine, kk.isZsm)
+                    cursor.execute(sql % data)
+                connect.commit()
+            # 垃圾回收
+            del kk, test
+        print("灵魂扫描---finish...")
+        pass
+
 
 zm=zMain()
 sendEmail=SendEmail()
@@ -234,17 +275,19 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # 同步历史数据
-    # zm.synHistoryStock()
-    # # # #扫描选股
-    # zm.scanStock()
+    zm.synHistoryStock()
+    # # #扫描选股
+    zm.scanStock()
+    #突然觉醒
+    zm.soul()
     # # #股票排名
-    # zm.sortByStockGrad()
-    # # # #作图
-    # zm.stockShow()
-    # #统计股票盈利情况
-    # s.statistic()
+    zm.sortByStockGrad()
+    # # #作图
+    zm.stockShow()
+    #统计股票盈利情况
+    s.statistic()
     # #回防
-    # zm.huiBu()
+    zm.huiBu()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
 

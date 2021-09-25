@@ -18,6 +18,7 @@ class SendEmail:
     other=[]
     Zsm=[]
     GSM=[]
+    SOUL=[]
     jingju=JingJu()
 
 
@@ -25,11 +26,12 @@ class SendEmail:
         query=QueryStock()
         codes=query.queryYouCanBuyStock()
         print(codes)
-
-
         bc=query.queryStockBC()
         print(bc)
         codes=codes+bc
+
+
+
 
         self.tendown=[]
         self.other=[]
@@ -56,19 +58,27 @@ class SendEmail:
             #机构调研
             # self.getJgdy(item,temp)
 
+            #反弹
             if item[5]==1:
                 self.Zsm.append(temp)
+            #吸筹
             if item[5]==2:
                 self.GSM.append(temp)
+            #灵魂反弹
+            if item[5]==3:
+                self.SOUL.append(temp)
 
         self.tendown=sorted(self.tendown, key=lambda s: s[2],reverse=False)
         self.other=sorted(self.other, key=lambda s: s[2],reverse=False)
         self.Zsm=sorted(self.Zsm, key=lambda s: s[6],reverse=True)
         self.GSM=sorted(self.GSM, key=lambda s: s[6],reverse=True)
+        self.SOUL=sorted(self.SOUL, key=lambda s: s[6],reverse=True)
         self.doSendStockInfoBeautiful(self.Zsm,currentPath,"\t001 回踩反弹（莫追高，高处不胜寒，电闪雷鸣，一朝泥石流！！全部死翘翘！）")
         self.doSendStockInfoBeautiful(self.GSM,currentPath,"\t002 底部吸筹(抄底抄到半山腰，泪两行，股市永远没有底！！)")
+        self.doSendStockInfoBeautiful(self.SOUL,currentPath,"\t003 五洋捉鳖(new 悲观到一定程度往往回心转意，股票较多，可能会选出垃圾股，需要优化！)")
         self.doSendStatisticForZsm()
         self.doSendStatisticForXiChou()
+        self.doSendStatisticForSoul()
         # self.doSendStockInfoBeautiful(self.tendown,currentPath,"   10+元以内")
         # self.doSendStockInfoBeautiful(self.other,currentPath,"  10-元以上")
         # self.doSendStatisticPaper()
@@ -286,7 +296,7 @@ class SendEmail:
         dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
         startTime = (dateTime_p + datetime.timedelta(days=-60)).strftime("%Y-%m-%d")
         result = query.queryStockYouBrought("zsm=1 and collect_date>'"+startTime+"'")
-        self.sendStatistic(result," 00【统计】1 回踩反弹策略最近60天-统计（胜率较高，但是需要对筹码有一定的了解，底部筹码没有松动，可入，否则逃吧）")
+        self.sendStatistic(result," 001【统计-回踩反弹】 最近60天-统计（需要对筹码有一定了解，当前价格要跟底部筹码分开！）")
 
     def doSendStatisticForXiChou(self):
         query = QueryStock()
@@ -294,7 +304,7 @@ class SendEmail:
         dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
         startTime = (dateTime_p + datetime.timedelta(days=-60)).strftime("%Y-%m-%d")
         result = query.queryStockYouBrought("zsm=2 and collect_date>'"+startTime+"'")
-        self.sendStatistic(result," 002【统计】 底部吸筹策略最近60天-统计（此策略，尖子生太少，中坚力量太弱，垃圾股太多，还没有优化！！）")
+        self.sendStatistic(result," 002【统计-底部吸筹】 最近60天-统计（需要对筹码有一定了解！！）")
 
     # 发送邮件
     def sendStatistic(self,result,title):
@@ -348,6 +358,14 @@ class SendEmail:
         except smtplib.SMTPException:
             print("Error: 无法发送邮件")
             print(smtplib.SMTPException)
+
+    def doSendStatisticForSoul(self):
+        query = QueryStock()
+        str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+        startTime = (dateTime_p + datetime.timedelta(days=-60)).strftime("%Y-%m-%d")
+        result = query.queryStockYouBrought("zsm=3 and collect_date>'" + startTime + "'")
+        self.sendStatistic(result, " 003【统计五洋捉鳖】 最近60天（气氛达到极致，心态或许真能回心转意，此策略是新开发策略，可量力体验！）")
 
 
 

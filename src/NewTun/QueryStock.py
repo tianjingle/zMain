@@ -119,7 +119,7 @@ class QueryStock:
         # 输出地量:当满足条件0.9上穿1/成交量(手)*1000>0.01AND"KDJ的J"<0时,在最低价*1位置书写文字,COLOR00FFFF
         # 吸筹: STICKLINE(VAR9 > -120, 0, VAR9, 2, 5), COLORMAGENTA;
         # 地量: DRAWTEXT(CROSS(0.9, 1 / VOL * 1000 > 0.01 AND "KDJ.J" < 0), L * 1, '地量'), COLOR00FFFF;
-        result=result.assign(VARXC=np.where(result.VAR9>9,result.VAR9,0))
+        result=result.assign(VARXC=np.where(result.VAR9>30,result.VAR9,0))
         t=result['VARXC'][-1:].iloc[0]
         # print("最后的一个"+str(t))
         #print(result[['low','VAR4','VAR5','VAR6','VAR7','VAR8','VAR9','VARXC']])
