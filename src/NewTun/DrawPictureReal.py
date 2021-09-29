@@ -88,7 +88,7 @@ class DrawPictureReal:
 
             # 绘制均线
             mav_colors = ['#ffffff', '#d4ff07', '#ff80ff', '#00e600', '#02e2f4', '#ffffb9', '#2a6848']  # 均线循环颜色
-            mav_period = [5, 10, 20, 30, 60, 120, 180]  # 定义要绘制的均线周期，可增减
+            mav_period = [5, 15, 30]  # 定义要绘制的均线周期，可增减
             n = len(result)
             for i in range(len(mav_period)):
                 if n >= mav_period[i]:
@@ -154,6 +154,7 @@ class DrawPictureReal:
     #填充ax1的数据
     def ax4Show(self,x,p,priceTwo):
         if self.isShow:
+            print(1)
             self.ax4.plot(x, p, c='b', label='移动成本')
             self.ax1.plot(x, p, c='b', label='移动成本')
             self.ax4.plot(self.xdates, priceTwo, c='r', label='jaige')
@@ -204,22 +205,22 @@ class DrawPictureReal:
 
     #神仙趋势线
     def shenxianQS(self, testX, H1, H2, H3):
-        self.ax4.plot(testX, H1, c="red", label='h1')
-        self.ax4.plot(testX, H2, c="green", label='h2')
-        self.ax4.plot(testX, H3, c="yellow", label='h3')
-        qiangshi=[]
-        for i in range(len(testX)):
-            if H1[i]!=None and H2[i]!=None and H3[i]!=None:
-                if H1[i]>H2[i] and H3[i]<H2[i]:
-                    qiangshi.append(i)
-                    self.ax1.axvline(i, ls='-', c='red', ymin=0, ymax=0.04, lw=1)
-                if H1[i]<H2[i] and H3[i]>H2[i]:
-                    self.ax1.axvline(i, ls='-', c='blue', ymin=0, ymax=0.04, lw=1)
-                if H1[i]>H2[i] and H3[i]>H1[i]:
-                    self.ax1.axvline(i, ls='-', c='yellow', ymin=0, ymax=0.04, lw=1)
-                if H1[i]<H2[i] and H3[i]<H1[i]:
-                    self.ax1.axvline(i, ls='-', c='green', ymin=0, ymax=0.04, lw=1)
-                if H1[i]>H3[i] and H3[i]>H2[i] or H2[i]>H3[i] and H3[i]>H1[i]:
-                    self.ax1.axvline(i, ls='-', c='white', ymin=0, ymax=0.04, lw=1)
+        # self.ax4.plot(testX, H1, c="red", label='h1')
+        # self.ax4.plot(testX, H2, c="green", label='h2')
+        # self.ax4.plot(testX, H3, c="yellow", label='h3')
+        # qiangshi=[]
+        # for i in range(len(testX)):
+        #     if H1[i]!=None and H2[i]!=None and H3[i]!=None:
+        #         if H1[i]>H2[i] and H3[i]<H2[i]:
+        #             qiangshi.append(i)
+        #             self.ax1.axvline(i, ls='-', c='red', ymin=0, ymax=0.04, lw=1)
+        #         if H1[i]<H2[i] and H3[i]>H2[i]:
+        #             self.ax1.axvline(i, ls='-', c='blue', ymin=0, ymax=0.04, lw=1)
+        #         if H1[i]>H2[i] and H3[i]>H1[i]:
+        #             self.ax1.axvline(i, ls='-', c='yellow', ymin=0, ymax=0.04, lw=1)
+        #         if H1[i]<H2[i] and H3[i]<H1[i]:
+        #             self.ax1.axvline(i, ls='-', c='green', ymin=0, ymax=0.04, lw=1)
+        #         if H1[i]>H3[i] and H3[i]>H2[i] or H2[i]>H3[i] and H3[i]>H1[i]:
+        #             self.ax1.axvline(i, ls='-', c='white', ymin=0, ymax=0.04, lw=1)
 
         pass

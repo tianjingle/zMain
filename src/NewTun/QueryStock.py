@@ -125,7 +125,7 @@ class QueryStock:
         #print(result[['low','VAR4','VAR5','VAR6','VAR7','VAR8','VAR9','VARXC']])
 
         maxPrice=talib.MAX(result['close'],data)[len(result)-1]
-        self.start=len(result)-self.window
+        # self.start=len(result)-self.window
         # print(maxPrice)
         result.date = range(0, len(result))  # 日期改变成序号
         resultTemp.append(result)

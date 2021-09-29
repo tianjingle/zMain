@@ -143,11 +143,6 @@ class StockInfoSyn:
             i=i+1
         pool = threadpool.ThreadPool(4)
         dict_vars = {'i': 1, 'stockTemp': stockCodeList, 'endTime': endTime}
-        dict_vars_1 = {'i': 1, 'stockTemp': stockCodeList1, 'endTime': endTime}
-        dict_vars_2 = {'i': 2, 'stockTemp': stockCodeList2, 'endTime': endTime}
-        dict_vars_3 = {'i': 3, 'stockTemp': stockCodeList3, 'endTime': endTime}
-        dict_vars_4 = {'i': 4, 'stockTemp': stockCodeList4, 'endTime': endTime}
-        func_var = [(None, dict_vars_1),(None, dict_vars_2),(None, dict_vars_3),(None, dict_vars_4)]
         func_var = [(None, dict_vars)]
         requests = threadpool.makeRequests(self.doSyn, func_var)
         for req in requests:
