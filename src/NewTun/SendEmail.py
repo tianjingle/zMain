@@ -49,14 +49,14 @@ class SendEmail:
             temp.append(item[6])   #8
 
 
-            # if price<=10:
-            #     self.tendown.append(temp)
-            # else:
-            #     self.other.append(temp)
-            #主力、散户、反转信号
-
-            #机构调研
-            # self.getJgdy(item,temp)
+            if price<=10:
+                self.tendown.append(temp)
+            else:
+                self.other.append(temp)
+            # 主力、散户、反转信号
+            #
+            # 机构调研
+            self.getJgdy(item,temp)
 
             #反弹
             if item[5]==1:
@@ -74,8 +74,8 @@ class SendEmail:
         self.GSM=sorted(self.GSM, key=lambda s: s[6],reverse=True)
         self.SOUL=sorted(self.SOUL, key=lambda s: s[6],reverse=True)
         self.doSendStockInfoBeautiful(self.Zsm,currentPath,"\t001 回踩反弹（莫追高，高处不胜寒，电闪雷鸣，一朝泥石流！！全部死翘翘！）")
-        self.doSendStockInfoBeautiful(self.GSM,currentPath,"\t002 底部吸筹(抄底抄到半山腰，泪两行，股市永远没有底！！)")
-        self.doSendStockInfoBeautiful(self.SOUL,currentPath,"\t003 五洋捉鳖(new 悲观到一定程度往往回心转意，股票较多，可能会选出垃圾股，需要优化！)")
+        self.doSendStockInfoBeautiful(self.GSM,currentPath,"\t002 底部吸筹(抄底抄到半山腰，泪两行，没有永远的yyds！！)")
+        self.doSendStockInfoBeautiful(self.SOUL,currentPath,"\t003 好望角(波涛汹涌的好望角，风暴和美景同在！)")
         self.doSendStatisticForZsm()
         self.doSendStatisticForXiChou()
         self.doSendStatisticForSoul()
@@ -172,8 +172,8 @@ class SendEmail:
                 myhy=myhy+"&nbsp;&nbsp;🔺"
                 myhyColor="<font color = 'red' >"
             if count>0:
-                # imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
-                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
+                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
+                # imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
             else:
                 imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
             count=count-1
@@ -196,25 +196,25 @@ class SendEmail:
 
         # 指定图片为当前目录
         count = 80
-        # for item in codes:
-        #     if count>0:
-        #         pngPath=currentPath+'\\temp\\' + item[0] + ".png"
-        #         if os.path.exists(pngPath):
-        #             fp = open(pngPath, 'rb')
-        #             msgImage = MIMEImage(fp.read())
-        #             fp.close()
-        #             temp = "<" + item[0] + ">"
-        #             # 定义图片 ID，在 HTML 文本中引用
-        #             msgImage.add_header('Content-ID', temp)
-        #         else:
-        #             fp = open(currentPath+"\\temp\\zMain.png", 'rb')
-        #             msgImage = MIMEImage(fp.read())
-        #             fp.close()
-        #             temp = "<" + item[0] + ">"
-        #             # 定义图片 ID，在 HTML 文本中引用
-        #             msgImage.add_header('Content-ID', temp)
-        #         msgRoot.attach(msgImage)
-        #     count=count-1
+        for item in codes:
+            if count>0:
+                pngPath=currentPath+'\\temp\\' + item[0] + ".png"
+                if os.path.exists(pngPath):
+                    fp = open(pngPath, 'rb')
+                    msgImage = MIMEImage(fp.read())
+                    fp.close()
+                    temp = "<" + item[0] + ">"
+                    # 定义图片 ID，在 HTML 文本中引用
+                    msgImage.add_header('Content-ID', temp)
+                else:
+                    fp = open(currentPath+"\\temp\\zMain.png", 'rb')
+                    msgImage = MIMEImage(fp.read())
+                    fp.close()
+                    temp = "<" + item[0] + ">"
+                    # 定义图片 ID，在 HTML 文本中引用
+                    msgImage.add_header('Content-ID', temp)
+                msgRoot.attach(msgImage)
+            count=count-1
         try:
             users=receivers.split(',')
             for item in users:
@@ -365,7 +365,7 @@ class SendEmail:
         dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
         startTime = (dateTime_p + datetime.timedelta(days=-60)).strftime("%Y-%m-%d")
         result = query.queryStockYouBrought("zsm=3 and collect_date>'" + startTime + "'")
-        self.sendStatistic(result, " 003【统计五洋捉鳖】 最近60天（气氛达到极致，心态或许真能回心转意，此策略是新开发策略，可量力体验！）")
+        self.sendStatistic(result, " 003【统计好望角】 最近60天（气氛达到极致，心态或许真能回心转意，此策略是新开发策略，可量力体验！）")
 
 
 
