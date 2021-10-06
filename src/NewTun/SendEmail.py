@@ -56,7 +56,7 @@ class SendEmail:
             # 主力、散户、反转信号
             #
             # 机构调研
-            self.getJgdy(item,temp)
+            # self.getJgdy(item,temp)
 
             #反弹
             if item[5]==1:
