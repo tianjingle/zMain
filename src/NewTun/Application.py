@@ -123,6 +123,8 @@ class Application:
         bigVolPriceLastOne=resultEnd[len(resultEnd)-1][5]
         myUp=resultEnd[len(resultEnd)-1][6]
         sanJx=resultEnd[len(resultEnd)-1][7]
+        currentYasuoXishu=resultEnd[len(resultEnd)-1][8]
+        self.cvValue=currentYasuoXishu
         print(bigVolPriceLastOne)
 
 
@@ -167,7 +169,8 @@ class Application:
                 if onslowyestaday < 0 and chengbenyestaday < 0 and onslowyestaday < onkslow and onkchengben < chengbenyestaday:
                     if currentx==total-1:
                         self.avgCostGrad=onkchengben
-                        self.cvValue = self.cv(choumaList)
+                        #采用压缩系数替换
+                        # self.cvValue = self.cv(choumaList)
                         self.currentPrice=float(result['close'][len(result)-1])
                         if self.currentPrice<=self.maxPrice*0.618:
                             self.isDownLine=1

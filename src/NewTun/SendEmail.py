@@ -164,6 +164,7 @@ class SendEmail:
         imgsOKstr = htmls+"<h2>2.股票详情</h2><p>"
         count=80
         #前二十的股票提供图片显示
+        codes=sorted(codes, key=lambda x:x[2])
         for item in codes:
             hy=hytj.get(item[7])
             myhy=item[7]

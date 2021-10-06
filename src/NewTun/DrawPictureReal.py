@@ -22,6 +22,7 @@ class DrawPictureReal:
     xdates=[]
     code=''
     savePath=''
+    diffrentYasuoXishu=0
 
 
     # 绘制蜡烛图
@@ -193,6 +194,7 @@ class DrawPictureReal:
             self.ax5.grid(True)  # 画网格
     #保存图片
     def savePng(self):
+        plt.xlabel("压缩系数:"+str(self.diffrentYasuoXishu))
         if self.isShow:
             isExists = os.path.exists(self.savePath)
             # 判断结果

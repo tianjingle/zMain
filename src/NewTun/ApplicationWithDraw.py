@@ -138,6 +138,8 @@ class ApplicationWithDraw:
         # 筹码计算
         resultEnd = self.chipCalculate(result, self.queryStock.start)
         resultEnd.sort(key=lambda resultEnd: resultEnd[0])
+        currentYasuoXishu = resultEnd[len(resultEnd) - 1][8]
+        self.draw.diffrentYasuoXishu=currentYasuoXishu
         resultEndLength = len(resultEnd)
         string = ""
         x = []

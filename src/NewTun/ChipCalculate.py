@@ -79,7 +79,7 @@ class ChipCalculate:
                     chip = Chip(index, open, close, max, min, avc_price, chouma)
                     self.DayChouMaList.append(chip)
             # 倒序计算完每日的筹码量，然后将筹码平均分布到当日的价格上
-            todayChouma, tmax, csdn ,maxVolprice,myUp= self.adviseChouMa2Price()
+            todayChouma, tmax, csdn ,maxVolprice,myUp,diffPresent= self.adviseChouMa2Price(currentPrice)
             if k == 0:
                 TtodayChouma = todayChouma
                 TTmax = tmax
@@ -102,12 +102,14 @@ class ChipCalculate:
                 csdnTemp.append(1)
             else:
                 csdnTemp.append(0)
+            #压缩系数
+            csdnTemp.append(diffPresent)
             result.append(csdnTemp)
         return result
 
         # 将每日的筹码分布到价格上
 
-    def adviseChouMa2Price(self):
+    def adviseChouMa2Price(self,currentPrice):
         length = len(self.DayChouMaList)
         self.price_vol.clear()
         for i in range(length):
@@ -177,9 +179,11 @@ class ChipCalculate:
         totalPrice = 0
         tmax = 0
         maxVolprice=0
+        minD=0
         for i in sorted(self.price_vol):
             # 这里的i就表示价格
             if isFirst == 1:
+                minD=i/100
                 isFirst = 0
             cm = []
             # 寻找最大的筹码量
@@ -194,9 +198,14 @@ class ChipCalculate:
             cm.append(i)
             cm.append(self.price_vol[i])
             choumaList.append(cm)
+        diffrent=(currentPrice-minD)
+        if diffrent<=0:
+            diffPresent=0
+        else:
+            diffPresent=diffrent/(0.1*currentPrice)
         if totalVol == 0:
             csdn = 0
-            return choumaList, 0, tmax, csdn,0,0
+            return choumaList, 0, tmax, csdn,0,diffPresent
         else:
             originSpend=(totalPrice / totalVol)
             csdn = round( originSpend/ 100, 2)
@@ -218,4 +227,4 @@ class ChipCalculate:
                     myUp=1
                 else:
                     myUp=0
-            return choumaList, tmax, csdn,maxVolprice,myUp
+            return choumaList, tmax, csdn,maxVolprice,myUp,diffPresent
