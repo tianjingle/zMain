@@ -68,6 +68,7 @@ class SendEmail:
                 self.GSM.append(temp)
             #灵魂反弹
             if item[5]==3:
+                temp[2]=temp[4]
                 self.SOUL.append(temp)
 
         self.tendown=sorted(self.tendown, key=lambda s: s[2],reverse=False)
