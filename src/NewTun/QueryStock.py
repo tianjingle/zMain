@@ -155,15 +155,16 @@ class QueryStock:
         cursor.execute(sql % data)
         for row in cursor.fetchall():
             temp=[]
-            temp.append(row[1])
-            temp.append(row[2])
-            temp.append(row[3])
-            temp.append(row[4])
-            temp.append(row[5])
+            temp.append(row[1])  #0
+            temp.append(row[2])  #1
+            temp.append(row[3])  #2
+            temp.append(row[4])  #3
+            temp.append(row[6])  #4
             #主力、散户、反转
-            temp.append(row[12])
-            temp.append(0)
-            codes.append(temp)
+            temp.append(row[12]) #5
+            temp.append(0)  #6
+            temp.append(6)  #7
+            codes.append(temp) #8
         # 关闭连接
         cursor.close()
         connect.close()
@@ -437,6 +438,7 @@ class QueryStock:
             # 主力、散户、反转
             temp.append(row[12])
             temp.append(1)
+            temp.append(row[6])
             codes.append(temp)
         # 关闭连接
         cursor.close()

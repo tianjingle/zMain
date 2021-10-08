@@ -47,12 +47,14 @@ class SendEmail:
             temp.append(0)   #6
             temp.append(item[3])   #7
             temp.append(item[6])   #8
+            temp.append(item[7])   #9
 
 
             if price<=10:
                 self.tendown.append(temp)
             else:
                 self.other.append(temp)
+
             # 主力、散户、反转信号
             #
             # 机构调研

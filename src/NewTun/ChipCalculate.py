@@ -198,7 +198,7 @@ class ChipCalculate:
             cm.append(i)
             cm.append(self.price_vol[i])
             choumaList.append(cm)
-        diffrent=(currentPrice-minD)
+        diffrent=(currentPrice-minD*1.17677)
         if diffrent<=0:
             diffPresent=0
         else:
