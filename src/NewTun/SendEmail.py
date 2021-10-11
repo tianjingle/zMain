@@ -47,12 +47,14 @@ class SendEmail:
             temp.append(0)   #6
             temp.append(item[3])   #7
             temp.append(item[6])   #8
+            temp.append(item[7])   #9
 
 
             if price<=10:
                 self.tendown.append(temp)
             else:
                 self.other.append(temp)
+
             # 主力、散户、反转信号
             #
             # 机构调研
@@ -66,6 +68,7 @@ class SendEmail:
                 self.GSM.append(temp)
             #灵魂反弹
             if item[5]==3:
+                temp[2]=temp[4]
                 self.SOUL.append(temp)
 
         self.tendown=sorted(self.tendown, key=lambda s: s[2],reverse=False)
@@ -164,6 +167,7 @@ class SendEmail:
         imgsOKstr = htmls+"<h2>2.股票详情</h2><p>"
         count=80
         #前二十的股票提供图片显示
+        codes=sorted(codes, key=lambda x:x[2])
         for item in codes:
             hy=hytj.get(item[7])
             myhy=item[7]
@@ -172,8 +176,12 @@ class SendEmail:
                 myhy=myhy+"&nbsp;&nbsp;🔺"
                 myhyColor="<font color = 'red' >"
             if count>0:
-                imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
-                # imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
+                #一般情况
+                if item[2]!=item[4]:
+                    imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"<img src='cid:"+item[0]+"'></p>"
+                else:
+                    #soul情况
+                    imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;0&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
             else:
                 imgsOKstr = imgsOKstr + "<p>"+myhyColor + str(item[0]) + "&nbsp;"+str(item[1])+"&nbsp;&nbsp;"+str(item[2])+"&nbsp;&nbsp;"+str(item[4])+"&nbsp;&nbsp;&nbsp;</br>"+myhy+"</font></br>"+str(item[5])+"</p></hr>"
             count=count-1
@@ -198,22 +206,24 @@ class SendEmail:
         count = 80
         for item in codes:
             if count>0:
-                pngPath=currentPath+'\\temp\\' + item[0] + ".png"
-                if os.path.exists(pngPath):
-                    fp = open(pngPath, 'rb')
-                    msgImage = MIMEImage(fp.read())
-                    fp.close()
-                    temp = "<" + item[0] + ">"
-                    # 定义图片 ID，在 HTML 文本中引用
-                    msgImage.add_header('Content-ID', temp)
-                else:
-                    fp = open(currentPath+"\\temp\\zMain.png", 'rb')
-                    msgImage = MIMEImage(fp.read())
-                    fp.close()
-                    temp = "<" + item[0] + ">"
-                    # 定义图片 ID，在 HTML 文本中引用
-                    msgImage.add_header('Content-ID', temp)
-                msgRoot.attach(msgImage)
+                #一般情况
+                if item[2]!=item[4]:
+                    pngPath=currentPath+'\\temp\\' + item[0] + ".png"
+                    if os.path.exists(pngPath):
+                        fp = open(pngPath, 'rb')
+                        msgImage = MIMEImage(fp.read())
+                        fp.close()
+                        temp = "<" + item[0] + ">"
+                        # 定义图片 ID，在 HTML 文本中引用
+                        msgImage.add_header('Content-ID', temp)
+                    else:
+                        fp = open(currentPath+"\\temp\\zMain.png", 'rb')
+                        msgImage = MIMEImage(fp.read())
+                        fp.close()
+                        temp = "<" + item[0] + ">"
+                        # 定义图片 ID，在 HTML 文本中引用
+                        msgImage.add_header('Content-ID', temp)
+                    msgRoot.attach(msgImage)
             count=count-1
         try:
             users=receivers.split(',')
@@ -331,7 +341,7 @@ class SendEmail:
         totalCount=len(result)-todayCount
         if totalCount==0:
             totalCount=1
-        endHtml="增长个数:"+str(successCount)+"&nbsp&nbsp&nbsp&nbsp总共个数："+str(totalCount)+"                </br> 百分比："+str(successCount*100/totalCount)+"%"+htmls
+        endHtml="增长个数:"+str(successCount)+"&nbsp&nbsp&nbsp&nbsp总共个数："+str(totalCount)+"                </br> 百分比："+str(round(successCount*100/totalCount,2))+"%"+htmls
         con = Connection()
         endDate = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         my_pass = con.emailPass

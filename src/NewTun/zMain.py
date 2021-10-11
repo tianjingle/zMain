@@ -30,7 +30,7 @@ class zMain:
         if self.connection.savePath!='':
             self.currentPath=self.connection.savePath
             if not os.path.exists(self.currentPath+"\\temp\\"):
-                os.makedirs(self.currentPath+"\\temp\\")
+                os.makedirs(self.currentPath)
         #设置一个默认的图片
         if not os.path.exists(self.currentPath+"\\temp\\zMain.png"):
             imgHeight=100
@@ -90,11 +90,6 @@ class zMain:
                 print(item[0]+"---"+item[1])
             elif kk.isZsm==2:
                 print("up")
-            elif kk.isZsm==3:
-                test.avgCostGrad=-1
-                print("通达信买点")
-            else:
-                continue
 
             if test.avgCostGrad < 0 or kk.isZsm>=1:
                 candidateTemp = []
@@ -141,7 +136,7 @@ class zMain:
         tableCheckSql = "show tables like 'candidate_stock'"
         cursor.execute(tableCheckSql)
         if len(list(cursor)) == 0:
-            createTable = "create table candidate_stock(id varchar(64) primary key not null,code varchar(64),name varchar(64),collect_date varchar(64),industry varchar(64),grad float,cv float,price float,now_price float,profit float,other varchar(45),is_down_line int,zsm int)"
+            createTable = "create table candidate_stock(id varchar(64) primary key not null,code varchar(64),name varchar(64),collect_date varchar(64),industry varchar(64),grad float,cv float,price float,now_price float,profit float,other varchar(45),is_down_line int,zsm int,dl int)"
             cursor.execute(createTable)
         print("-----------------------------scan stock------------------------------------")
         print("start time:" + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
@@ -202,6 +197,74 @@ class zMain:
                 test.execute(item[0],True,self.currentPath)
                 print(str(item[1])+"   "+item[0]+"   "+str(item[3]))
 
+    def huiBu(self):
+        query = QueryStock()
+        connect = pymysql.Connect(
+            host=self.connection.host,
+            port=self.connection.port,
+            user=self.connection.user,
+            passwd=self.connection.passwd,
+            db=self.connection.db,
+            charset=self.connection.charset
+        )
+        # 获取游标
+        cursor = connect.cursor()
+        today = query.todayIsTrue()[0]
+        codes=query.queryStock20DayReccently()
+        for i in range(len(codes)):
+            test = Application()
+            kk = test.executeForBc(codes[i][0])
+            if kk.isZsm==3:
+                # 开始修正
+                print(codes[i][0]+"---补充修正3..."+codes[i][1])
+                sql = "update candidate_stock set dl=1 where collect_date='" + codes[i][2] + "' and code='" + codes[i][0] + "' and id!=''"
+                print(sql)
+                cursor.execute(sql)
+                connect.commit()
+            # 垃圾回收
+            del kk, test
+        pass
+
+    #突然觉醒
+    def soul(self):
+        query = QueryStock()
+        today = query.todayIsTrue()[0]
+        connect = pymysql.Connect(
+            host=self.connection.host,
+            port=self.connection.port,
+            user=self.connection.user,
+            passwd=self.connection.passwd,
+            db=self.connection.db,
+            charset=self.connection.charset
+        )
+        # 获取游标
+        cursor = connect.cursor()
+        print("-----------------------------scan soul stock------------------------------------")
+        print("start time:" + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+        syn = StockInfoSyn()
+        basicStock = syn.getBiscicStock()
+        for i in range(len(basicStock)):
+            item = basicStock[i]
+            if item[1].__contains__("ST"):
+                continue
+            test = Application()
+            kk = test.executeForBc(basicStock[i][0])
+            if kk.isZsm == 3:
+                # 插入数据
+                sql = "select * from candidate_stock where code='%s' and collect_date='%s'"
+                data = (item[0], today)
+                cursor.execute(sql % data)
+                if len(list(cursor)) == 0:
+                    print(item)
+                    sql = "INSERT INTO candidate_stock (id, code, name,collect_date,industry,grad,cv,is_down_line,zsm) VALUES ( '%s', '%s','%s', '%s','%s', %.8f, %.8f,%i,%i)"
+                    data = (uuid.uuid1(), item[0], item[1], today, item[3], test.avgCostGrad, abs(test.cvValue),
+                            test.isDownLine, kk.isZsm)
+                    cursor.execute(sql % data)
+                connect.commit()
+            # 垃圾回收
+            del kk, test
+        print("灵魂扫描---finish...")
+        pass
 
 
 zm=zMain()
@@ -214,14 +277,18 @@ else:
     # 同步历史数据
     # zm.synHistoryStock()
     # # #扫描选股
-    zm.scanStock()
-    #股票排名
+    # zm.scanStock()
+    # #突然觉醒
+    # zm.soul()
+    # # # #股票排名
     # zm.sortByStockGrad()
-    # #作图
+    # # # #作图
     # zm.stockShow()
-    #统计股票盈利情况
-    s.statistic()
+    # #统计股票盈利情况
+    # s.statistic()
+    # # #回防
+    # zm.huiBu()
     # 分类股票推荐发送
-    # sendEmail.sendYouCanBuy(zm.currentPath)
+    sendEmail.sendYouCanBuy(zm.currentPath)
 
 

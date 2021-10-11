@@ -1,3 +1,6 @@
+import datetime
+import time
+
 import numpy as np
 import talib
 import pymysql.cursors
@@ -14,7 +17,7 @@ class QueryStock:
     isIndex=False
 
     def init(self,window):
-        self.window=window+120
+        self.window=window+80
 
     def queryStock(self, stackCode):
         # 连接数据库
@@ -116,13 +119,13 @@ class QueryStock:
         # 输出地量:当满足条件0.9上穿1/成交量(手)*1000>0.01AND"KDJ的J"<0时,在最低价*1位置书写文字,COLOR00FFFF
         # 吸筹: STICKLINE(VAR9 > -120, 0, VAR9, 2, 5), COLORMAGENTA;
         # 地量: DRAWTEXT(CROSS(0.9, 1 / VOL * 1000 > 0.01 AND "KDJ.J" < 0), L * 1, '地量'), COLOR00FFFF;
-        result=result.assign(VARXC=np.where(result.VAR9>9,result.VAR9,0))
+        result=result.assign(VARXC=np.where(result.VAR9>30,result.VAR9,0))
         t=result['VARXC'][-1:].iloc[0]
         # print("最后的一个"+str(t))
         #print(result[['low','VAR4','VAR5','VAR6','VAR7','VAR8','VAR9','VARXC']])
 
         maxPrice=talib.MAX(result['close'],data)[len(result)-1]
-        self.start=len(result)-self.window
+        # self.start=len(result)-self.window
         # print(maxPrice)
         result.date = range(0, len(result))  # 日期改变成序号
         resultTemp.append(result)
@@ -152,14 +155,16 @@ class QueryStock:
         cursor.execute(sql % data)
         for row in cursor.fetchall():
             temp=[]
-            temp.append(row[1])
-            temp.append(row[2])
-            temp.append(row[3])
-            temp.append(row[4])
-            temp.append(row[5])
+            temp.append(row[1])  #0
+            temp.append(row[2])  #1
+            temp.append(row[3])  #2
+            temp.append(row[4])  #3
+            temp.append(row[6])  #4
             #主力、散户、反转
-            temp.append(row[12])
-            codes.append(temp)
+            temp.append(row[12]) #5
+            temp.append(0)  #6
+            temp.append(6)  #7
+            codes.append(temp) #8
         # 关闭连接
         cursor.close()
         connect.close()
@@ -364,3 +369,78 @@ class QueryStock:
         cursor.close()
         connect.close()
         return result
+
+    def queryStock20DayReccently(self):
+        # 连接数据库
+        codes=[]
+        connection=Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset
+        )
+        cursor = connect.cursor()
+        # 获取游标
+        str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+        startTime = (dateTime_p + datetime.timedelta(days=-20)).strftime("%Y-%m-%d")
+        # 查询数据
+        sql = "SELECT distinct * FROM `candidate_stock` where zsm=2 and collect_date>'%s' order by cv asc,grad desc"
+        data = (startTime)
+        cursor.execute(sql % data)
+        for row in cursor.fetchall():
+            temp=[]
+            temp.append(row[1])
+            temp.append(row[2])
+            temp.append(row[3])
+            temp.append(row[4])
+            temp.append(row[5])
+            #主力、散户、反转
+            temp.append(row[12])
+            codes.append(temp)
+        # 关闭连接
+        cursor.close()
+        connect.close()
+        return codes
+
+    def queryStockBC(self):
+        str_p = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        dateTime_p = datetime.datetime.strptime(str_p, '%Y-%m-%d %H:%M:%S')
+        startTime = (dateTime_p + datetime.timedelta(days=-20)).strftime("%Y-%m-%d")
+
+        # 连接数据库
+        codes = []
+        connection = Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset,
+            sql_mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+        )
+        cursor = connect.cursor()
+        # 查询数据
+        sql = "select a.* from candidate_stock a inner join (SELECT id,code,min(collect_date),profit from candidate_stock where  collect_date>'%s' and dl=1 group by code order by profit desc) b where a.id=b.id"
+        data = (startTime)
+        cursor.execute(sql % data)
+        for row in cursor.fetchall():
+            temp = []
+            temp.append(row[1])
+            temp.append(row[2])
+            temp.append(row[3])
+            temp.append(row[4])
+            temp.append(row[5])
+            # 主力、散户、反转
+            temp.append(row[12])
+            temp.append(1)
+            temp.append(row[6])
+            codes.append(temp)
+        # 关闭连接
+        cursor.close()
+        connect.close()
+        return codes
