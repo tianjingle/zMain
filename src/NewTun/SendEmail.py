@@ -206,22 +206,24 @@ class SendEmail:
         count = 80
         for item in codes:
             if count>0:
-                pngPath=currentPath+'\\temp\\' + item[0] + ".png"
-                if os.path.exists(pngPath):
-                    fp = open(pngPath, 'rb')
-                    msgImage = MIMEImage(fp.read())
-                    fp.close()
-                    temp = "<" + item[0] + ">"
-                    # 定义图片 ID，在 HTML 文本中引用
-                    msgImage.add_header('Content-ID', temp)
-                else:
-                    fp = open(currentPath+"\\temp\\zMain.png", 'rb')
-                    msgImage = MIMEImage(fp.read())
-                    fp.close()
-                    temp = "<" + item[0] + ">"
-                    # 定义图片 ID，在 HTML 文本中引用
-                    msgImage.add_header('Content-ID', temp)
-                msgRoot.attach(msgImage)
+                #一般情况
+                if item[2]!=item[4]:
+                    pngPath=currentPath+'\\temp\\' + item[0] + ".png"
+                    if os.path.exists(pngPath):
+                        fp = open(pngPath, 'rb')
+                        msgImage = MIMEImage(fp.read())
+                        fp.close()
+                        temp = "<" + item[0] + ">"
+                        # 定义图片 ID，在 HTML 文本中引用
+                        msgImage.add_header('Content-ID', temp)
+                    else:
+                        fp = open(currentPath+"\\temp\\zMain.png", 'rb')
+                        msgImage = MIMEImage(fp.read())
+                        fp.close()
+                        temp = "<" + item[0] + ">"
+                        # 定义图片 ID，在 HTML 文本中引用
+                        msgImage.add_header('Content-ID', temp)
+                    msgRoot.attach(msgImage)
             count=count-1
         try:
             users=receivers.split(',')
@@ -339,7 +341,7 @@ class SendEmail:
         totalCount=len(result)-todayCount
         if totalCount==0:
             totalCount=1
-        endHtml="增长个数:"+str(successCount)+"&nbsp&nbsp&nbsp&nbsp总共个数："+str(totalCount)+"                </br> 百分比："+str(successCount*100/totalCount)+"%"+htmls
+        endHtml="增长个数:"+str(successCount)+"&nbsp&nbsp&nbsp&nbsp总共个数："+str(totalCount)+"                </br> 百分比："+str(round(successCount*100/totalCount,2))+"%"+htmls
         con = Connection()
         endDate = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         my_pass = con.emailPass
