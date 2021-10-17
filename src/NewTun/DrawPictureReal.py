@@ -100,6 +100,13 @@ class DrawPictureReal:
             #     myX=item[0]
             #     myY=item[1]
             #     ax1.plot(myX, myY, color="yellow", linewidth=0.3)
+            for index, row in result.iterrows():
+                currentIndex = index - 0
+                XCH = row['VARXC']
+                if float(XCH) > 0:
+                    self.ax1.axvline(currentIndex, ls='-', c='orange', ymax=0.02, ymin=0, lw=2)
+
+
 
             self.ax1.plot(xdates ,t3Price ,label='t3price')
             self.ax1.set_title(code)  # 标题

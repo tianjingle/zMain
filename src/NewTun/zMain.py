@@ -274,7 +274,7 @@ s=Statistics()
 if zm.connection.isTest:
     zm.stockShow()
 else:
-    ## 同步历史数据
+    # 同步历史数据
     zm.synHistoryStock()
     # #扫描选股
     zm.scanStock()
