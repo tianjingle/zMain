@@ -153,14 +153,14 @@ websocket-client 1.1.0
 https://tushare.pro/login
 ![tushare的token](src/NewTun/temp/token.jpg)
 将tushare的token填入到BasicStock.py的token字段中。按一下操作进行
-![所有股票入库](src/NewTun/temp/allStock.jpg)
+![所有股票入库](src/NewTun/temp/stock.jpg)
 
 
 # 启动zMain
-
+## 运行zMain.py即可
 ![zMain效果图](src/NewTun/temp/zmain.jpg)
 ## 数据效果
-![查看拉取信息](src/NewTun/temp/fetchData.jpg)
+![查看拉取信息](src/NewTun/temp/stock.jpg)
 
 # 股票池旧库添加字段
 ```sql
