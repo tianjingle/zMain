@@ -106,7 +106,7 @@ pip install -r requirements.txt
 # 首次启动
 首次启动的时候需要获取上海、深圳交易所所有的股票。然后填入我们的数据库,因为baoStock获取的数据比较差，这块用tushare，但是tushare需要填写一个token，您可能需要注册一下，然后替换掉我代码中的token即可。
 https://tushare.pro/login
-![tushare的token](src/NewTun/temp/token.jpg)
+![tushare的token](src/NewTun/temp/img.png)
 将tushare的token填入到BasicStock.py的token字段中。按一下操作进行
 ![所有股票入库](src/NewTun/temp/stock.jpg)
 
