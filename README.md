@@ -86,58 +86,13 @@ scipy            1.6.3     #python科学计算库，线性回归等。
 prettytable      2.1.0     #
 ```
 
-# 安装办法
+# 安装办法(文件项目根目录中)
 
 ```sqlite
-pip install numpy
-pip install panda
-。。。。等等等
+pip install -r requirements.txt
 ```
 
-# 全部依赖的库
-
-```sqlite
-Package          Version
----------------- ---------
-prettytable      2.1.0
-scipy            1.6.3
-baostock         0.8.8
-beautifulsoup4   4.9.3
-bs4              0.0.1
-certifi          2021.5.30
-chardet          4.0.0
-cycler           0.10.0
-diagrams         0.20.0
-graphviz         0.16
-greenlet         1.1.0
-idna             2.10
-Jinja2           2.11.3
-kiwisolver       1.3.1
-lxml             4.6.3
-MarkupSafe       2.0.1
-matplotlib       3.4.2
-numpy            1.20.3
-panda            0.3.1
-pandas           1.2.4
-Pillow           8.2.0
-pip              21.1.2
-PyMySQL          1.0.2
-pyparsing        2.4.7
-python-dateutil  2.8.1
-pytz             2021.1
-requests         2.25.1
-setuptools       56.0.0
-simplejson       3.17.2
-six              1.16.0
-soupsieve        2.2.1
-SQLAlchemy       1.4.18
-sqlparse         0.4.1
-TA-Lib           0.4.20
-tushare          1.2.62
-urllib3          1.26.5
-websocket-client 1.1.0
-
-```
+# 全部依赖的库【requirements.txt】
 
 
 # 安装ta-lib的方法
