@@ -7,7 +7,7 @@
 - 合作：QQ：2695062879
 
 
-![zMain效果图](src/NewTun/temp/sh.600059.png)
+![zMain效果图](src/NewTun/temp/zmain.jpg)
 
 # 设置数据库的sql_model
 ```sql
@@ -158,7 +158,7 @@ https://tushare.pro/login
 
 # 启动zMain
 
-![zMain效果图](src/NewTun/temp/runZmain.jpg)
+![zMain效果图](src/NewTun/temp/zmain.jpg)
 ## 数据效果
 ![查看拉取信息](src/NewTun/temp/fetchData.jpg)
 
