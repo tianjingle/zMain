@@ -134,6 +134,8 @@ class QueryStock:
         return resultTemp
 
     def queryYouCanBuyStock(self):
+
+
         # 连接数据库
         codes=[]
         connection=Connection()
@@ -150,14 +152,20 @@ class QueryStock:
         # 获取游标
         today = self.todayIsTrue()[0]
         # 查询数据
-        sql = "SELECT * FROM `candidate_stock` where collect_date='%s' order by cv asc,grad desc"
-        data = (today)
-        cursor.execute(sql % data)
+        sql = "SELECT * FROM `candidate_stock` where zsm in (1,2) and collect_date in (select t.k from (select distinct(collect_date) as k from noun.candidate_stock order by collect_date desc limit 5) as t) order by cv asc"
+        cursor.execute(sql)
         for row in cursor.fetchall():
             temp=[]
             temp.append(row[1])  #0
-            temp.append(row[2])  #1
-            temp.append(row[3])  #2
+            # temp.append(row[2])  #1
+            if today==row[3]:
+                temp.append(row[2])  # 1
+                temp.append(row[3])  #2
+
+            else:
+                times=row[3]
+                temp.append(row[2] + "{" + times[-5:] + "}")  # 1
+                temp.append(row[3] + row[1])  # 2
             temp.append(row[4])  #3
             temp.append(row[6])  #4
             #主力、散户、反转

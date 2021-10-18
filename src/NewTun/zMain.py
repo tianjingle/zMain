@@ -275,19 +275,19 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # 同步历史数据
-    zm.synHistoryStock()
-    # #扫描选股
-    zm.scanStock()
-    #突然觉醒
-    zm.soul()
-    # # #股票排名
-    zm.sortByStockGrad()
-    # # #作图
-    zm.stockShow()
-    #统计股票盈利情况
-    s.statistic()
-    # #回防
-    zm.huiBu()
+    # zm.synHistoryStock()
+    # # #扫描选股
+    # zm.scanStock()
+    # #突然觉醒
+    # zm.soul()
+    # # # #股票排名
+    # zm.sortByStockGrad()
+    # # # #作图
+    # zm.stockShow()
+    # #统计股票盈利情况
+    # s.statistic()
+    # # #回防
+    # zm.huiBu()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
 
