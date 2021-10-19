@@ -152,7 +152,7 @@ class QueryStock:
         # 获取游标
         today = self.todayIsTrue()[0]
         # 查询数据
-        sql = "SELECT * FROM `candidate_stock` where zsm in (1,2) and collect_date in (select t.k from (select distinct(collect_date) as k from noun.candidate_stock order by collect_date desc limit 5) as t) order by cv asc"
+        sql = "SELECT * FROM `candidate_stock` where zsm in (1,2,3) and collect_date in (select t.k from (select distinct(collect_date) as k from noun.candidate_stock order by collect_date desc limit 3) as t) order by cv asc"
         cursor.execute(sql)
         for row in cursor.fetchall():
             temp=[]
@@ -164,7 +164,7 @@ class QueryStock:
 
             else:
                 times=row[3]
-                temp.append(row[2] + "{" + times[-5:] + "}")  # 1
+                temp.append(row[2] + "@" + times[-5:] + "@")  # 1
                 temp.append(row[3] + row[1])  # 2
             temp.append(row[4])  #3
             temp.append(row[6])  #4
