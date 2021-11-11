@@ -6,9 +6,9 @@
 - 思路扩展、抱团发展、共同进步
 - 合作：QQ：2695062879
 - 网站：http://119.29.96.71/zMain/
-
-![zMain效果图](src/NewTun/temp/zmain.jpg)
-
+- 手机扫码：
+![在这里插入图片描述](src/NewTun/temp/zmain-Logo.png)
+  
 # 设置数据库的sql_model
 ```sql
 SELECT industry,count(*) as num FROM noun.candidate_stock where zsm=2 group by industry;
