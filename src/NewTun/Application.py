@@ -86,7 +86,7 @@ class Application:
         if len(result[0])<200:
             return self
         if result[2]>0:
-            print("通达信买点...")
+            print("好望角买点...")
             self.isZsm=3
             return self
         else:
@@ -206,7 +206,9 @@ class Application:
             return self
         if result[2]>0:
             self.isZsm=3
-            return self
+        if result[3]>0:
+            print("亚马逊买点~")
+            self.isZsm=4
         return self
 
 
