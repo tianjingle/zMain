@@ -82,7 +82,7 @@ class Application:
 
     #执行器
     def execute(self,code):
-        result=self.queryStock.queryStock(code)
+        result=self.queryStock.queryStock(code,30)
         if len(result[0])<200:
             return self
         if result[2]>0:
@@ -201,7 +201,7 @@ class Application:
 
     #补充买点
     def executeForBc(self, code):
-        result = self.queryStock.queryStock(code)
+        result = self.queryStock.queryStock(code,10)
         if len(result[0]) < 200:
             return self
         if result[2]>0:

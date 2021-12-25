@@ -19,7 +19,7 @@ class QueryStock:
     def init(self,window):
         self.window=window+80
 
-    def queryStock(self, stackCode):
+    def queryStock(self, stackCode,limit):
         # 连接数据库
         resultTemp=[]
         connection=Connection()
@@ -119,7 +119,7 @@ class QueryStock:
         # 输出地量:当满足条件0.9上穿1/成交量(手)*1000>0.01AND"KDJ的J"<0时,在最低价*1位置书写文字,COLOR00FFFF
         # 吸筹: STICKLINE(VAR9 > -120, 0, VAR9, 2, 5), COLORMAGENTA;
         # 地量: DRAWTEXT(CROSS(0.9, 1 / VOL * 1000 > 0.01 AND "KDJ.J" < 0), L * 1, '地量'), COLOR00FFFF;
-        result=result.assign(VARXC=np.where(result.VAR9>30,result.VAR9,0))
+        result=result.assign(VARXC=np.where(result.VAR9>limit,result.VAR9,0))
         t=result['VARXC'][-1:].iloc[0]
         # print("倒数第一天："+str(t))
         endTwo=result['VARXC'][-2:-1].iloc[0]

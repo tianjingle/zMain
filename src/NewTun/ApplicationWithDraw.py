@@ -47,14 +47,14 @@ class ApplicationWithDraw:
         return resultEnd
 
     def executeForTest(self, code, savePath):
-        result = self.queryStock.queryStock(code)
+        result = self.queryStock.queryStock(code,10)
         if len(result[0]) < 200:
             return self
         return self.core(result[0], code, True, savePath, True)
 
     # 执行器
     def execute(self, code, isShow, savePath):
-        result = self.queryStock.queryStock(code)
+        result = self.queryStock.queryStock(code,30)
         if len(result[0]) < 200:
             return self
         return self.core(result[0], code, isShow, savePath, False)

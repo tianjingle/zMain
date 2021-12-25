@@ -66,7 +66,7 @@ class TestJgdy:
             a = endDateSp - collectDateSp
             testBefore=a.days
             queryStock = QueryStock()
-            result=queryStock.queryStock(item[0])
+            result=queryStock.queryStock(item[0],10)
             result=result[0]
             z = float(result['z'][len(result) - int(testBefore)])
             s = float(result['s'][len(result) - int(testBefore)])
@@ -103,7 +103,7 @@ class TestJgdy:
             testBefore=self.workdays(item[2],item[8])
             print(testBefore)
             queryStock = QueryStock()
-            result=queryStock.queryStock(item[0])
+            result=queryStock.queryStock(item[0],10)
             result=result[0]
             application=Application()
             resultEnd=application.chipCalculate(result,0,False)
