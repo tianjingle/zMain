@@ -121,6 +121,9 @@ class QueryStock:
         # 地量: DRAWTEXT(CROSS(0.9, 1 / VOL * 1000 > 0.01 AND "KDJ.J" < 0), L * 1, '地量'), COLOR00FFFF;
         result=result.assign(VARXC=np.where(result.VAR9>30,result.VAR9,0))
         t=result['VARXC'][-1:].iloc[0]
+        print("倒数第一天："+str(t))
+        endTwo=result['VARXC'][-2:-1].iloc[0]
+        print("倒数第二天"+str(endTwo))
         # print("最后的一个"+str(t))
         #print(result[['low','VAR4','VAR5','VAR6','VAR7','VAR8','VAR9','VARXC']])
 
