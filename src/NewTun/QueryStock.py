@@ -120,7 +120,7 @@ class QueryStock:
         # 吸筹: STICKLINE(VAR9 > -120, 0, VAR9, 2, 5), COLORMAGENTA;
         # 地量: DRAWTEXT(CROSS(0.9, 1 / VOL * 1000 > 0.01 AND "KDJ.J" < 0), L * 1, '地量'), COLOR00FFFF;
         if limit==30:
-            result=result.assign(VARXC=np.where(result.VAR9>30,result.VAR9,0))
+            result = result.assign(VARXC=np.where(result.VAR9 > 30, result.VAR9, 0))
         else:
             result = result.assign(VARXC=np.where(result.VAR9 > 30, result.VAR9, 0))
             result = result.assign(VARXCLimit=np.where(result.VAR9 > limit, result.VAR9, 0))
