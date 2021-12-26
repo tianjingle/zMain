@@ -90,7 +90,6 @@ class zMain:
                 print(item[0]+"---"+item[1])
             elif kk.isZsm==2:
                 print("up")
-
             if test.avgCostGrad < 0 or kk.isZsm>=1:
                 candidateTemp = []
                 candidateTemp.append(item[0])
@@ -249,7 +248,10 @@ class zMain:
                 continue
             test = Application()
             kk = test.executeForBc(basicStock[i][0])
-            if kk.isZsm == 3:
+            if kk.isZsm==4:
+                print("--------亚马逊的河流------")
+                print(item[0]+"---"+item[1])
+            if kk.isZsm == 3 or kk.isZsm == 4:
                 # 插入数据
                 sql = "select * from candidate_stock where code='%s' and collect_date='%s'"
                 data = (item[0], today)
@@ -260,10 +262,17 @@ class zMain:
                     data = (uuid.uuid1(), item[0], item[1], today, item[3], test.avgCostGrad, abs(test.cvValue),
                             test.isDownLine, kk.isZsm)
                     cursor.execute(sql % data)
+                elif kk.isZsm > 0:
+                    # 开始修正
+                    print("修正..")
+                    sql = "update candidate_stock set zsm=" + str(kk.isZsm) + " where collect_date='" + today + "' and code='" + item[0] + "' and id!=''"
+                    print(sql)
+                    cursor.execute(sql)
                 connect.commit()
             # 垃圾回收
             del kk, test
         print("灵魂扫描---finish...")
+        print("----------------------soul---end------------------------")
         pass
 
 
@@ -278,8 +287,8 @@ else:
     # zm.synHistoryStock()
     # # #扫描选股
     # zm.scanStock()
-    # #突然觉醒
-    # zm.soul()
+    #突然觉醒
+    zm.soul()
     # # # #股票排名
     # zm.sortByStockGrad()
     # # # #作图
@@ -288,7 +297,7 @@ else:
     # s.statistic()
     # # #回防
     # zm.huiBu()
-    # 分类股票推荐发送
-    sendEmail.sendYouCanBuy(zm.currentPath)
+    # # 分类股票推荐发送
+    # sendEmail.sendYouCanBuy(zm.currentPath)
 
 

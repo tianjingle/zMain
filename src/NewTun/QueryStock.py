@@ -141,13 +141,14 @@ class QueryStock:
             if fanzhuan<=0:
                 #导数第二天的反转信息
                 fanzhuan=result['m'][-2:-1].iloc[0]
-                if fanzhuan>0:
-                    if endOne>0 and fanzhuan>0:
-                        huaejie=1
-                    if endTwo>0 and fanzhuan>0:
-                        huaejie=1
-                    if endThree>0 and fanzhuan>0:
-                        huaejie=1
+
+            if fanzhuan>0:
+                if endOne>0 and fanzhuan>0:
+                    huaejie=1
+                if endTwo>0 and fanzhuan>0:
+                    huaejie=1
+                if endThree>0 and fanzhuan>0:
+                    huaejie=1
 
         # print("最后的一个"+str(t))
         #print(result[['low','VAR4','VAR5','VAR6','VAR7','VAR8','VAR9','VARXC']])
