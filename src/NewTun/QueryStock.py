@@ -119,20 +119,35 @@ class QueryStock:
         # 输出地量:当满足条件0.9上穿1/成交量(手)*1000>0.01AND"KDJ的J"<0时,在最低价*1位置书写文字,COLOR00FFFF
         # 吸筹: STICKLINE(VAR9 > -120, 0, VAR9, 2, 5), COLORMAGENTA;
         # 地量: DRAWTEXT(CROSS(0.9, 1 / VOL * 1000 > 0.01 AND "KDJ.J" < 0), L * 1, '地量'), COLOR00FFFF;
-        result=result.assign(VARXC=np.where(result.VAR9>limit,result.VAR9,0))
+        if limit==30:
+            result=result.assign(VARXC=np.where(result.VAR9>30,result.VAR9,0))
+        else:
+            result = result.assign(VARXC=np.where(result.VAR9 > 30, result.VAR9, 0))
+            result = result.assign(VARXCLimit=np.where(result.VAR9 > limit, result.VAR9, 0))
+        #soul
         t=result['VARXC'][-1:].iloc[0]
         # print("倒数第一天："+str(t))
-        endTwo=result['VARXC'][-2:-1].iloc[0]
-        # print("倒数第二天"+str(endTwo))
 
-        #好望角+反转
-        #挑战~华尔街
         huaejie=0
-        fanzhuan=result['m'][-1:].iloc[0]
-        if endTwo>0 and fanzhuan>0:
-            huaejie=1
-        if t>0 and fanzhuan>0:
-            huaejie=1
+        if limit<30:
+            endOne = result['VARXCLimit'][-1:].iloc[0]
+            endTwo=result['VARXCLimit'][-2:-1].iloc[0]
+            endThree=result['VARXCLimit'][-3:-2].iloc[0]
+            # print("倒数第二天"+str(endTwo))
+
+            #好望角+反转
+            #当天的反转信号
+            fanzhuan=result['m'][-1:].iloc[0]
+            if fanzhuan<=0:
+                #导数第二天的反转信息
+                fanzhuan=result['m'][-2:-1].iloc[0]
+                if fanzhuan>0:
+                    if endOne>0 and fanzhuan>0:
+                        huaejie=1
+                    if endTwo>0 and fanzhuan>0:
+                        huaejie=1
+                    if endThree>0 and fanzhuan>0:
+                        huaejie=1
 
         # print("最后的一个"+str(t))
         #print(result[['low','VAR4','VAR5','VAR6','VAR7','VAR8','VAR9','VARXC']])

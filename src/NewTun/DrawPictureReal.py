@@ -106,8 +106,6 @@ class DrawPictureReal:
                 if float(XCH) > 0:
                     self.ax1.axvline(currentIndex, ls='-', c='orange', ymax=0.02, ymin=0, lw=2)
 
-
-
             self.ax1.plot(xdates ,t3Price ,label='t3price')
             self.ax1.set_title(code)  # 标题
             self.ax1.grid(True)  # 画网格

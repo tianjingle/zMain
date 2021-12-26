@@ -205,6 +205,7 @@ class Application:
         if len(result[0]) < 200:
             return self
         if result[2]>0:
+            print("好望角买点~")
             self.isZsm=3
         if result[3]>0:
             print("亚马逊买点~")
