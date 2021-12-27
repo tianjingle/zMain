@@ -1,7 +1,6 @@
 # zMain
 
 [个人学习]:123。
-http://119.29.96.71/zMain/
   
 # 设置数据库的sql_model
 ```sql
