@@ -82,17 +82,46 @@ class Application:
 
     #执行器
     def execute(self,code):
+
+
+
+
         result=self.queryStock.queryStock(code,30)
+
+
+
         if len(result[0])<200:
             return self
+        type=self.parseLongli(result[0])
         if result[2]>0:
             print("好望角买点...")
             self.isZsm=3
+            if type<=0.5:
+                self.isZsm=5
             return self
+        if type<=0.5:
+            self.isZsm=6
         else:
-            return self
-        #return self.core(result[0],result[1])
+            return self.core(result[0],result[1])
 
+    def parseLongli(self,result):
+        x=[]
+        y=[]
+        for index, row in result.iterrows():
+            x.append(index)
+            a = round(row['DONGLILINE'], 2)
+            y.append(float(a))
+        today=y[len(y)-1]
+        yestoday=y[len(y)-2]
+        if today >= 0.2 and yestoday < 0.2:
+            return 0.2
+        if today > 0.5 and yestoday <= 0.5:
+            return 0.5
+        if today >= 3.2 and yestoday < 3.2:
+            return 3.2
+        if today < 3.5 and yestoday >= 3.5:
+            return 3.5
+        return 0
 
     #核心调度器
     def core(self,result,maxPrice):

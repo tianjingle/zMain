@@ -18,6 +18,12 @@ class ApplicationWithDraw:
     queryStock = QueryStock()
     avgCostGrad = 0
 
+    # 0.5   -> 向上 0.5
+    # 0.2   -> 向上 0.2
+    # 3.2   -> 向上 3.2
+    # 3.5   -> 向上 3.5
+    dongliType=0
+
     def setStackCode(self):
         least = LeastSquare()
         draw = DrawPictureReal()
@@ -282,5 +288,27 @@ class ApplicationWithDraw:
         # self.draw.ax5Show(self.loopBack.baseRmb,self.loopBack.buysell,self.loopBack.myRmb)
         self.draw.ax5ShowZsm(zsm, fList, priceBigvolPriceIndexs, iList, zList, sList)
 
+        x=[]
+        y=[]
+        for index, row in result.iterrows():
+            x.append(index)
+            a = round(row['DONGLILINE'], 2)
+            y.append(float(a))
+
+        self.draw.dongli(x,y)
         self.draw.savePng()
+        self.dongliType=self.parseDongliType(y[len(y)-2],y[len(y)-1])
         return self
+
+
+    # 动力的值是多少
+    def parseDongliType(self,yestoday,today):
+        if today >= 0.2 and yestoday < 0.2:
+            return 0.2
+        if today > 0.5 and yestoday <= 0.5:
+            return 0.5
+        if today >= 3.2 and yestoday < 3.2:
+            return 3.2
+        if today < 3.5 and yestoday >= 3.5:
+            return 3.5
+        return 0

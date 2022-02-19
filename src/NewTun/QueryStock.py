@@ -74,6 +74,20 @@ class QueryStock:
         result['VAR100']=100
         result['VAR10']=10
         result['VAR0']=0
+        #---------------------------动力-----开始
+        result['VAR_4']=4
+        # VAR2 := LLV(LOW, 10);
+        result['VAR2_dongli']=result['low'].rolling(10).min().astype(float)
+        # VAR3 := HHV(HIGH, 25);
+        result['VAR3_dongli']=result['high'].rolling(25).max().astype(float)
+        # 动力线 := EMA((CLOSE - VAR2) / (VAR3 - VAR2) * 4, 4);
+        result['CLOSE_VAR2']=result['close'].astype(float)-result['VAR2_dongli'].astype(float)
+        result['VAR3_VAR2']=result['VAR3_dongli'].astype(float)-result['VAR2_dongli'].astype(float)
+        result['CLOSE_VAR2_VAR3_VAR2X4'] = talib.DIV(result['CLOSE_VAR2'], result['VAR3_VAR2'])
+        result['dongliTTTT']=talib.MULT(result['CLOSE_VAR2_VAR3_VAR2X4'], result['VAR_4'])
+        result['DONGLILINE'] = talib.EMA(result['dongliTTTT'], 4)
+        # ---------------------------动力-----结束
+
 
         #主力散户吸筹
         # VAR2:=REF(LOW,1);      前一日的最低价

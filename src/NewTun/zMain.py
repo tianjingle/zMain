@@ -142,39 +142,15 @@ class zMain:
         syn = StockInfoSyn()
         basicStock = syn.getBiscicStock()
         allStocklength=len(basicStock)
-        stockCodeList1=[]
-        stockCodeList2=[]
-        stockCodeList3=[]
-        stockCodeList4=[]
         stockCodeList=[]
 
         i=0
         for j in range(allStocklength):
             item = basicStock[j]
             stockCodeList.append(item)
-            if i<1000:
-                stockCodeList1.append(item)
-            elif i>=1000 and i<2000:
-                stockCodeList2.append(item)
-            elif i>=2000 and i<3000:
-                stockCodeList3.append(item)
-            else:
-                stockCodeList4.append(item)
-            i=i+1
 
-        pool = threadpool.ThreadPool(4)
-        # t, stockLength, basicStock, scanFlag, today, cursor, connect
-        dict_vars_1 = {'t': 1, 'stockLength':len(stockCodeList1),'basicStock': stockCodeList1,'today':today,'cursor':cursor,'connect':connect}
-        dict_vars_2 = {'t': 2, 'stockLength':len(stockCodeList2),'basicStock': stockCodeList2,'today':today,'cursor':cursor,'connect':connect}
-        dict_vars_3 = {'t': 3, 'stockLength':len(stockCodeList3), 'basicStock':stockCodeList3,'today':today,'cursor':cursor,'connect':connect}
-        dict_vars_4 = {'t': 4, 'stockLength':len(stockCodeList4), 'basicStock':stockCodeList4,'today':today,'cursor':cursor,'connect':connect}
-        func_var = [(None, dict_vars_1),(None, dict_vars_2),(None, dict_vars_3),(None, dict_vars_4)]
-        # requests = threadpool.makeRequests(self.doScan, func_var)
-        # for req in requests:
-        #     pool.putRequest(req)
         self.doScan(1,len(stockCodeList),stockCodeList,today,cursor,connect)
         print("xi")
-        pool.wait()
         print("-----扫描结束-----")
 
 
@@ -208,7 +184,6 @@ class zMain:
         )
         # 获取游标
         cursor = connect.cursor()
-        today = query.todayIsTrue()[0]
         codes=query.queryStock20DayReccently()
         for i in range(len(codes)):
             test = Application()
@@ -284,20 +259,20 @@ if zm.connection.isTest:
     zm.stockShow()
 else:
     # 同步历史数据
-    # zm.synHistoryStock()
-    # # #扫描选股
-    # zm.scanStock()
+    zm.synHistoryStock()
+    # #扫描选股
+    zm.scanStock()
     #突然觉醒
     zm.soul()
-    # # # #股票排名
-    # zm.sortByStockGrad()
-    # # # #作图
-    # zm.stockShow()
-    # #统计股票盈利情况
-    # s.statistic()
-    # # #回防
-    # zm.huiBu()
-    # # 分类股票推荐发送
-    # sendEmail.sendYouCanBuy(zm.currentPath)
+    # # #股票排名
+    zm.sortByStockGrad()
+    # # #作图
+    zm.stockShow()
+    #统计股票盈利情况
+    s.statistic()
+    # #回防
+    zm.huiBu()
+    # 分类股票推荐发送
+    sendEmail.sendYouCanBuy(zm.currentPath)
 
 

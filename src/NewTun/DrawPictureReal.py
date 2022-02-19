@@ -231,3 +231,38 @@ class DrawPictureReal:
         #             self.ax1.axvline(i, ls='-', c='white', ymin=0, ymax=0.04, lw=1)
 
         pass
+
+    def dongli(self, x,y):
+        if self.isShow:
+            a=0
+            end=0
+            for item in y:
+                if item>a:
+                    a=item
+                end=item
+            for i in range(len(x)):
+                if i< len(x) and i>1:
+                    if y[i]>=0.2 and y[i-1]<0.2 and y[i-1]!=0:
+                        self.ax4.axvline(x[i], ls='-', c='red', ymin=0, ymax=0.2, lw=5)
+                        self.ax1.axvline(x[i], ls='-', c='red', ymin=0, ymax=0.2, lw=5)
+                    if y[i]>0.5 and y[i-1]<=0.5 and y[i-1]!=0:
+                        self.ax4.axvline(x[i], ls='-', c='#f47920', ymin=0, ymax=0.1, lw=5)
+                        self.ax1.axvline(x[i], ls='-', c='#f47920', ymin=0, ymax=0.1, lw=5)
+                    if y[i]>=3.2 and y[i-1]<3.2:
+                        self.ax4.axvline(x[i], ls='-', c='b', ymin=1, ymax=0.9, lw=5)
+                        self.ax1.axvline(x[i], ls='-', c='b', ymin=1, ymax=0.9, lw=5)
+                    if y[i]<3.5 and y[i-1]>=3.5:
+                        self.ax4.axvline(x[i], ls='-', c='white', ymin=1, ymax=0.8, lw=5)
+                        self.ax1.axvline(x[i], ls='-', c='white', ymin=1, ymax=0.8, lw=5)
+
+            # self.ax4.axhline(0.2, ls='-.', c='red', lw=0.5)
+            self.ax4.axhline(0.5, ls='-.', c='#f47920', lw=0.5)
+            self.ax4.axhline(1.75, ls='-.', c='palegreen', lw=0.5)
+            self.ax4.axhline(3.2, ls='-.', c='b', lw=0.5)
+            # self.ax4.axhline(3.5, ls='-.', c='white', lw=0.5)
+            self.ax4.plot(x, y, c='pink', lw=0.5, label='aaaa')
+
+
+
+
+        pass
