@@ -1,4 +1,9 @@
 import configparser
+import os.path
+
+from src.NewTun.TDX.Core import Core
+
+
 class Connection:
 
     host = 'localhost'
@@ -27,7 +32,7 @@ class Connection:
     def __init__(self):
 
         cf = configparser.ConfigParser()
-        cf.read("config.ini")  # 读取配置文件，如果写文件的绝对路径，就可以不用os模块
+        cf.read("C:\\Users\\Administrator\\PycharmProjects\\zMain\\src\\NewTun\\config.ini")  # 读取配置文件，如果写文件的绝对路径，就可以不用os模块
         self.emailPass = cf.get("Email","pass")  # 发件人邮箱密码
         self.emaialUser = cf.get("Email","user")  # 收件人邮箱账号，我这边发送给自己
         self.sender = cf.get("Email","sender")
@@ -44,6 +49,7 @@ class Connection:
         self.isJgdy=cf.get("Jgdy","isJgdy")
         self.savePath=cf.get("Path","savePath")
         self.tdxDayPath=cf.get("Path","tdxDayPath")
+
 
         testCode=cf.get('Test','testCode')
         if testCode!='':

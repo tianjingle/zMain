@@ -6,6 +6,7 @@ import pymysql.cursors
 from src.NewTun.Connection import Connection
 from src.NewTun.JgdyQuery import JgdyQuery
 from src.NewTun.StockFetch import StockFetch
+from src.NewTun.TDX.Core import Core
 
 
 class StockInfoSyn:
@@ -69,6 +70,7 @@ class StockInfoSyn:
         )
         cursor = connect.cursor()
         startTime = ''
+
         for row in stockTemp:
             isToady = False
             print("thread-" + str(i) +" - " + row)
@@ -122,32 +124,14 @@ class StockInfoSyn:
         allStockBasic='select * from stock_basic'
         cursor.execute(allStockBasic)
         endTime=time.strftime('%Y-%m-%d',time.localtime(time.time()))
-
-        stockCodeList1=[]
-        stockCodeList2=[]
-        stockCodeList3=[]
-        stockCodeList4=[]
         stockCodeList=[]
 
-        i=0
+        stockCodeList.append("sh.000001")
         for row in cursor.fetchall():
             stockCodeList.append(row[0])
-            if i<1000:
-                stockCodeList1.append(row[0])
-            elif i>=1000 and i<2000:
-                stockCodeList2.append(row[0])
-            elif i>=2000 and i<3000:
-                stockCodeList3.append(row[0])
-            else:
-                stockCodeList4.append(row[0])
-            i=i+1
-        pool = threadpool.ThreadPool(4)
-        dict_vars = {'i': 1, 'stockTemp': stockCodeList, 'endTime': endTime}
-        func_var = [(None, dict_vars)]
-        requests = threadpool.makeRequests(self.doSyn, func_var)
-        for req in requests:
-            pool.putRequest(req)
-        pool.wait()
+        self.doSyn(1,stockCodeList,endTime)
         print("--------------syn---------end....")
         cursor.close()
         connect.close()
+
+

@@ -58,7 +58,7 @@ class Application:
             temp.append(int(row['tradestatus']))
             chipCalculateList.append(temp)
         if isProd==False:
-            chipCalculateList=chipCalculateList[-112:]
+            chipCalculateList=chipCalculateList[-120:]
         calcualate = ChipCalculate()
         resultEnd = calcualate.getDataByShowLine(chipCalculateList,isProd)
         del calcualate
@@ -82,27 +82,10 @@ class Application:
 
     #执行器
     def execute(self,code):
-
-
-
-
         result=self.queryStock.queryStock(code,30)
-
-
-
         if len(result[0])<200:
             return self
-        type=self.parseLongli(result[0])
-        if result[2]>0:
-            print("好望角买点...")
-            self.isZsm=3
-            if type<=0.5:
-                self.isZsm=5
-            return self
-        if type<=0.5:
-            self.isZsm=6
-        else:
-            return self.core(result[0],result[1])
+        return self.core(result[0],result[1])
 
     def parseLongli(self,result):
         x=[]
@@ -145,11 +128,9 @@ class Application:
         # lock = threading.Lock()  # 申请一把锁
         # lock.acquire()
         resultEnd = self.chipCalculate(result, self.queryStock.start,False)
-        # lock.release()
-        choumaList=np.array(resultEnd[2][2])
+        resultEnd.sort(key=lambda resultEnd: resultEnd[0])
         x = []
         p = []
-        resultEnd.sort(key=lambda resultEnd: resultEnd[0])
         for i in range(len(resultEnd)):
             x.append(resultEnd[i][0])
             p.append(resultEnd[i][1])
@@ -162,9 +143,6 @@ class Application:
         self.cvValue=currentYasuoXishu
         print(bigVolPriceLastOne)
 
-
-        myResult = pd.DataFrame()
-        myResult['tprice'] = p
         tianjingle = self.least.everyErChengPriceForArray(np.array(x), np.array(p), 30)
         x1 = []
         y1 = []
@@ -229,16 +207,48 @@ class Application:
         return 0
 
     #补充买点
-    def executeForBc(self, code):
-        result = self.queryStock.queryStock(code,10)
+    def executeForFanzhuanDongli(self, code):
+        result = self.queryStock.queryStock(code,1)
         if len(result[0]) < 200:
             return self
-        if result[2]>0:
+        type=self.parseLongli(result[0])
+        fanzhuan=result[3]
+        if type<=0.5 and type!=0 and fanzhuan>0:
+            self.isZsm=99
+            print("动力+反转:\t"+code)
+        return self
+
+    #补充买点
+    def executeForBc(self, code):
+        result = self.queryStock.queryStock(code,1)
+        if len(result[0]) < 200:
+            return self
+        type=self.parseLongli(result[0])
+        inner=0
+
+        if result[2]>30:
+            print(result[2])
             print("好望角买点~")
             self.isZsm=3
+        else:
+            if type<=0.5 and type!=0 and result[2]>1:
+                inner=1
+                print("旺角动力~")
+                print(result[2])
+                self.isZsm=5
         if result[3]>0:
             print("亚马逊买点~")
             self.isZsm=4
+            if type<=0.5 and type!=0:
+                inner=1
+                print("旺角动力~")
+                self.isZsm=5
+        if inner==0 and type<=0.5 and type!=0:
+            print("纯动力~")
+            self.isZsm=6
+        if type<=0.5 and type!=0 and result[2]>1 and result[3]>0:
+            print("超级+++++")
+            self.isZsm = 7
         return self
 
 

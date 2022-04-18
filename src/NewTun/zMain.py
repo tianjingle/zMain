@@ -1,8 +1,21 @@
+
+import sys
+import os
+
+from src.NewTun.TDX.Core import Core
+
+curPath=os.path.abspath(os.path.dirname(__file__))
+rootPath=os.path.split(curPath)[0]
+sys.path.append(rootPath)
+sys.path.append("path")
+print(sys.path)
+
 import time
 import os
 import uuid
 import pymysql
 import threadpool
+
 from PIL import Image, ImageDraw, ImageFont
 
 from src.NewTun.ApplicationWithDraw import ApplicationWithDraw
@@ -55,12 +68,19 @@ class zMain:
     #通过股票数据
     def synHistoryStock(self):
         if self.connection.syn=='True':
+            # 通达信自动下载
+            if self.connection.tdxDayPath != '' and os.path.exists(self.connection.tdxDayPath):
+                core = Core()
+                core.exec()
             print("-----------------------------syn stock------------------------------------")
             print("start time:"+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
             syn=StockInfoSyn()
             syn.isJgdy=self.connection.isJgdy
             syn.synStockInfo()
             print("start time:"+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+
+
+
 
 
     def doScan(self,t,stockLength,basicStock,today,cursor,connect):
@@ -80,16 +100,19 @@ class zMain:
                 scanFlag.writeIndex(t,today,0)
 
             test = Application()
-            if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None:
+            if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None :
                 print("thread-"+str(t)+"\t"+item[0]+"\t"+item[1]+"\t"+item[2]+"\t"+item[3])
             else:
                 continue
+            # if item[0]!="sz.300730":
+            #     continue
             kk = test.execute(item[0])
             if kk.isZsm==1:
                 print("thread"+str(t)+"\t--------主力、散户、反转信号出现------")
                 print(item[0]+"---"+item[1])
             elif kk.isZsm==2:
                 print("up")
+
             if test.avgCostGrad < 0 or kk.isZsm>=1:
                 candidateTemp = []
                 candidateTemp.append(item[0])
@@ -167,10 +190,13 @@ class zMain:
             print("test one stock:"+self.connection.testCode)
             test.executeForTest(self.connection.testCode,self.currentPath)
         else:
-            for item in self.candidate:
+            todayStocks=QueryStock()
+            todays=todayStocks.todayRecentDaye(3)
+            codes=todayStocks.queryStockByDate(todays)
+            for item in codes:
                 test = ApplicationWithDraw()
                 test.execute(item[0],True,self.currentPath)
-                print(str(item[1])+"   "+item[0]+"   "+str(item[3]))
+                print("image\t"+str(item[1])+"   "+item[0]+"   "+str(item[3]))
 
     def huiBu(self):
         query = QueryStock()
@@ -226,7 +252,9 @@ class zMain:
             if kk.isZsm==4:
                 print("--------亚马逊的河流------")
                 print(item[0]+"---"+item[1])
-            if kk.isZsm == 3 or kk.isZsm == 4:
+            if kk.isZsm==7:
+                print("超级+++++:"+basicStock[i][0])
+            if kk.isZsm == 3 or kk.isZsm == 4 or kk.isZsm==5 or kk.isZsm==6 or kk.isZsm==7:
                 # 插入数据
                 sql = "select * from candidate_stock where code='%s' and collect_date='%s'"
                 data = (item[0], today)
@@ -260,18 +288,18 @@ if zm.connection.isTest:
 else:
     # 同步历史数据
     zm.synHistoryStock()
-    # #扫描选股
+    # # #扫描选股
     zm.scanStock()
     #突然觉醒
     zm.soul()
-    # # #股票排名
+    # # # #股票排名
     zm.sortByStockGrad()
-    # # #作图
-    zm.stockShow()
     #统计股票盈利情况
     s.statistic()
     # #回防
     zm.huiBu()
+    # # #作图
+    zm.stockShow()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
 

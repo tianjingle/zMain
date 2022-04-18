@@ -1,3 +1,5 @@
+import os
+import sys
 from datetime import time
 
 import pandas as pd
@@ -15,6 +17,7 @@ from src.NewTun.ReadTdx2Db import ReadTdx2Db
 class StockFetch:
 
     tdxData=None
+    first=True
 
     def __init__(self):
         self.tdxData=ReadTdx2Db()
@@ -27,6 +30,7 @@ class StockFetch:
             startTime = '2015-07-01'
         if endTime == None:
             endTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+
         lg = bs.login()
         rs = bs.query_history_k_data_plus(code,
                                           "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST",
@@ -38,6 +42,13 @@ class StockFetch:
         while (rs.error_code == '0') & rs.next():
             data_list.append(rs.get_row_data())
         result = pd.DataFrame(data_list, columns=rs.fields)
+
+        if code=='sh.000001':
+            if len(result) == 0:
+                print("no data from baostock,maybe it is holiday!")
+                sys.exit()
+            return
+
         ##将数据写入mysql的数据库，但需要先通过sqlalchemy.create_engine建立连接,且字符编码设置为utf8，否则有些latin字符不能处理
         connection=Connection()
         connectionStr="mysql+pymysql://"+connection.user+":"+connection.passwd+"@"+connection.host+":"+str(connection.port)+"/"+connection.db+"?charset=utf8"
@@ -71,5 +82,9 @@ class StockFetch:
         cursor = connect.cursor()
         cursor.execute(sql)
         connect.commit()
+
+
+
+
 
 

@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 from matplotlib import colors as mcolors  # 用于颜色转换成渲染时顶点需要的颜色格式
 from matplotlib.collections import LineCollection, PolyCollection  # 用于绘制直线集合和多边形集合
 import matplotlib.ticker as ticker  # 用于日期刻度定制
@@ -19,6 +20,7 @@ class DrawPictureReal:
     ax3=None
     ax4=None
     ax5=None
+    cmx=None
     xdates=[]
     code=''
     savePath=''
@@ -54,12 +56,13 @@ class DrawPictureReal:
             plt.rc('grid', c='#800000', alpha=0.9, ls=':', lw=0.8)  # 网格属性(颜色，透明值，线条样式，线宽)
             plt.rc('lines', lw=0.8)  # 全局线宽
             fig = plt.figure(figsize=(16, 8))
-            left, width = 0.05, 0.9
+            left, width = 0.05, 0.8
             self.ax1 = fig.add_axes([left, 0.5, width, 0.48])  # left, bottom, width, height
             self.ax2 = fig.add_axes([left, 0.4, width, 0.1], sharex=self.ax1)  # 共享ax1轴
             self.ax3 = fig.add_axes([left, 0.3, width, 0.09], sharex=self.ax1)  # 共享ax1轴
             self.ax4 = fig.add_axes([left, 0.2, width, 0.09], sharex=self.ax1)  # 共享ax1轴
             self.ax5 = fig.add_axes([left, 0.1, width, 0.09], sharex=self.ax1)  # 共享ax1轴
+            self.cmx = fig.add_axes([0.85, 0.5, 0.15, 0.48], sharey=self.ax1)  # 共享ax1轴
             plt.setp(self.ax1.get_xticklabels(), visible=True)  # 使x轴刻度文本不可见，因为共享，不需要显示
             plt.setp(self.ax2.get_xticklabels(), visible=True)  # 使x轴刻度文本不可见，因为共享，不需要显示
             self.ax1.xaxis.set_major_formatter(ticker.FuncFormatter(self.format_date))  # 设置自定义x轴格式化日期函数
@@ -102,9 +105,11 @@ class DrawPictureReal:
             #     ax1.plot(myX, myY, color="yellow", linewidth=0.3)
             for index, row in result.iterrows():
                 currentIndex = index - 0
-                XCH = row['VARXC']
+                XCH = row['VARXCLimit']
                 if float(XCH) > 0:
                     self.ax1.axvline(currentIndex, ls='-', c='orange', ymax=0.02, ymin=0, lw=2)
+
+
 
             self.ax1.plot(xdates ,t3Price ,label='t3price')
             self.ax1.set_title(code)  # 标题
@@ -266,3 +271,14 @@ class DrawPictureReal:
 
 
         pass
+
+    def chouma(self,resultEnd):
+        if self.isShow:
+            choumaList = resultEnd[0][2]
+            TavcPrice = resultEnd[0][1]
+            tmax = resultEnd[0][4]
+            chouMalit = np.array(choumaList)
+            for item in chouMalit:
+                item[0] = item[0] * 1.0 / 100
+            self.cmx.barh(chouMalit[:, 0], chouMalit[:, 1], color="Turquoise", align="center", height=0.05)
+            self.cmx.barh(TavcPrice, tmax, color="red", height=0.05)

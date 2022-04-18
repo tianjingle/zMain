@@ -1,7 +1,7 @@
 
 class ScanFlag:
 
-    stockIndex='stockIndex'
+    stockIndex='C:\\Users\\Administrator\\PycharmProjects\\zMain\\src\\NewTun\\stockIndex'
     baseIndex=0
 
     def readIndex(self,i,today):

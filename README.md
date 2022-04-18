@@ -2,7 +2,13 @@
 
 [个人学习]:123。
 
-  
+
+
+- 合作：QQ：2695062879
+
+
+![zMain效果图](src/NewTun/temp/zmain.jpg)
+
 # 设置数据库的sql_model
 ```sql
 SELECT industry,count(*) as num FROM noun.candidate_stock where zsm=2 group by industry;
@@ -80,13 +86,58 @@ scipy            1.6.3     #python科学计算库，线性回归等。
 prettytable      2.1.0     #
 ```
 
-# 安装办法(文件项目根目录中)
+# 安装办法
 
 ```sqlite
-pip install -r requirements.txt
+pip install numpy
+pip install panda
+。。。。等等等
 ```
 
-# 全部依赖的库【requirements.txt】
+# 全部依赖的库
+
+```sqlite
+Package          Version
+---------------- ---------
+prettytable      2.1.0
+scipy            1.6.3
+baostock         0.8.8
+beautifulsoup4   4.9.3
+bs4              0.0.1
+certifi          2021.5.30
+chardet          4.0.0
+cycler           0.10.0
+diagrams         0.20.0
+graphviz         0.16
+greenlet         1.1.0
+idna             2.10
+Jinja2           2.11.3
+kiwisolver       1.3.1
+lxml             4.6.3
+MarkupSafe       2.0.1
+matplotlib       3.4.2
+numpy            1.20.3
+panda            0.3.1
+pandas           1.2.4
+Pillow           8.2.0
+pip              21.1.2
+PyMySQL          1.0.2
+pyparsing        2.4.7
+python-dateutil  2.8.1
+pytz             2021.1
+requests         2.25.1
+setuptools       56.0.0
+simplejson       3.17.2
+six              1.16.0
+soupsieve        2.2.1
+SQLAlchemy       1.4.18
+sqlparse         0.4.1
+TA-Lib           0.4.20
+tushare          1.2.62
+urllib3          1.26.5
+websocket-client 1.1.0
+
+```
 
 
 # 安装ta-lib的方法
@@ -100,16 +151,16 @@ pip install -r requirements.txt
 # 首次启动
 首次启动的时候需要获取上海、深圳交易所所有的股票。然后填入我们的数据库,因为baoStock获取的数据比较差，这块用tushare，但是tushare需要填写一个token，您可能需要注册一下，然后替换掉我代码中的token即可。
 https://tushare.pro/login
-![tushare的token](src/NewTun/temp/img.png)
+![tushare的token](src/NewTun/temp/token.jpg)
 将tushare的token填入到BasicStock.py的token字段中。按一下操作进行
-![所有股票入库](src/NewTun/temp/stock.jpg)
+![所有股票入库](src/NewTun/temp/allStock.jpg)
 
 
 # 启动zMain
-## 运行zMain.py即可
+
 ![zMain效果图](src/NewTun/temp/zmain.jpg)
 ## 数据效果
-![查看拉取信息](src/NewTun/temp/stock.jpg)
+![查看拉取信息](src/NewTun/temp/fetchData.jpg)
 
 # 股票池旧库添加字段
 ```sql

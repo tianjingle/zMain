@@ -1,3 +1,6 @@
+import os
+import sys
+
 import pandas as pd
 
 from src.NewTun.ChipCalculate import ChipCalculate
@@ -6,7 +9,9 @@ from src.NewTun.LeastSquare import LeastSquare
 from src.NewTun.LoopBack import LoopBack
 from src.NewTun.QueryStock import QueryStock
 import numpy as np
-
+curPath=os.path.abspath(os.path.dirname(__file__))
+rootPath=os.path.split(curPath)[0]
+sys.path.append(rootPath)
 
 class ApplicationWithDraw:
     window = 160
@@ -17,12 +22,6 @@ class ApplicationWithDraw:
     loopBack = LoopBack()
     queryStock = QueryStock()
     avgCostGrad = 0
-
-    # 0.5   -> 向上 0.5
-    # 0.2   -> 向上 0.2
-    # 3.2   -> 向上 3.2
-    # 3.5   -> 向上 3.5
-    dongliType=0
 
     def setStackCode(self):
         least = LeastSquare()
@@ -35,6 +34,7 @@ class ApplicationWithDraw:
     # 筹码计算
     def chipCalculate(self, result, start):
         chipCalculateList = []
+        currentPrice=0
         for index, row in result.iterrows():
             temp = []
             currentIndex = index - start
@@ -43,6 +43,7 @@ class ApplicationWithDraw:
             temp.append(row['high'])
             temp.append(row['low'])
             temp.append(row['close'])
+            currentPrice=float(row['close'])
             temp.append(row['volume'])
             temp.append(row['tprice'])
             temp.append(row['turn'])
@@ -50,17 +51,17 @@ class ApplicationWithDraw:
             chipCalculateList.append(temp)
         calcualate = ChipCalculate()
         resultEnd = calcualate.getDataByShowLine(chipCalculateList,True)
-        return resultEnd
+        return resultEnd,currentPrice
 
     def executeForTest(self, code, savePath):
-        result = self.queryStock.queryStock(code,10)
+        result = self.queryStock.queryStock(code,25)
         if len(result[0]) < 200:
             return self
         return self.core(result[0], code, True, savePath, True)
 
     # 执行器
     def execute(self, code, isShow, savePath):
-        result = self.queryStock.queryStock(code,30)
+        result = self.queryStock.queryStock(code,25)
         if len(result[0]) < 200:
             return self
         return self.core(result[0], code, isShow, savePath, False)
@@ -142,8 +143,8 @@ class ApplicationWithDraw:
         yijieSlowdict = dict(zip(wangXSlow, wangYSlow))
 
         # 筹码计算
-        resultEnd = self.chipCalculate(result, self.queryStock.start)
-        resultEnd.sort(key=lambda resultEnd: resultEnd[0])
+        resultEnd,currentPrice = self.chipCalculate(result, self.queryStock.start)
+        self.draw.chouma(resultEnd)
         currentYasuoXishu = resultEnd[len(resultEnd) - 1][8]
         self.draw.diffrentYasuoXishu=currentYasuoXishu
         resultEndLength = len(resultEnd)
@@ -157,8 +158,6 @@ class ApplicationWithDraw:
             x.append(resultEnd[i][0])
             string = string + "," + str(resultEnd[i][1])
             p.append(resultEnd[i][1])
-            if i == resultEndLength - 1:
-                priceJJJ = resultEnd[i][1]
             # 价格大于50%的筹码线
             if resultEnd[i][5] == 1:
                 priceBigvolPriceIndexs.append(resultEnd[i][0])
@@ -194,15 +193,13 @@ class ApplicationWithDraw:
         for item in tianjingle:
             kX = item[0]
             kk = item[1]
-            x1.append(kX)
+            x1.append(kX+30)
             y1.append(kk)
         pingjunchengbendic = dict(zip(x1, y1))
         self.draw.ax3Show(x1, y1, 'r', '一阶导数')
 
         oldTwok = 0
         oldOne = 0
-        # 牛顿策略
-        NewtonBuySall = []
         downlimitTemp = 0
 
         # 回测的缓存数据

@@ -1,9 +1,9 @@
 class JingJu:
     #名人名言的字典
-    files=["20210627.txt","20210628.txt"]
+    files=["C:\\Users\\Administrator\\PycharmProjects\\zMain\\src\\NewTun\\20210627.txt","C:\\Users\\Administrator\\PycharmProjects\\zMain\\src\\NewTun\\20210628.txt"]
     list=[]
     #现在读取到的名言警句的游标
-    indexFile="index"
+    indexFile="C:\\Users\\Administrator\\PycharmProjects\\zMain\\src\\NewTun\\index"
     index=0
     #警句整理，去除序号和开都的标点符号
     def executeFile(self):
