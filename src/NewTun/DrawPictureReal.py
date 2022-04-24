@@ -272,13 +272,26 @@ class DrawPictureReal:
 
         pass
 
-    def chouma(self,resultEnd):
+    def chouma(self,resultEnd,price):
         if self.isShow:
             choumaList = resultEnd[0][2]
             TavcPrice = resultEnd[0][1]
             tmax = resultEnd[0][4]
             chouMalit = np.array(choumaList)
+
+
+            ChoumaUpy = []
+            ChoumaUpHight = []
+            ChoumaDowny = []
+            ChoumaDownHight = []
             for item in chouMalit:
-                item[0] = item[0] * 1.0 / 100
-            self.cmx.barh(chouMalit[:, 0], chouMalit[:, 1], color="Turquoise", align="center", height=0.05)
+                priceTemp = item[0] * 1.0 / 100
+                if priceTemp >= price:
+                    ChoumaUpy.append(priceTemp)
+                    ChoumaUpHight.append(item[1])
+                else:
+                    ChoumaDowny.append(priceTemp)
+                    ChoumaDownHight.append(item[1])
+            self.cmx.barh(ChoumaDowny, ChoumaDownHight, color="y", align="center", height=0.05)
+            self.cmx.barh(ChoumaUpy, ChoumaUpHight, color="Turquoise", align="center", height=0.05)
             self.cmx.barh(TavcPrice, tmax, color="red", height=0.05)

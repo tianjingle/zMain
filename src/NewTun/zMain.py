@@ -2,6 +2,7 @@
 import sys
 import os
 
+from src.NewTun.DongliFanzhuan import DongliFanzhuan
 from src.NewTun.TDX.Core import Core
 
 curPath=os.path.abspath(os.path.dirname(__file__))
@@ -282,6 +283,7 @@ class zMain:
 zm=zMain()
 sendEmail=SendEmail()
 s=Statistics()
+donglifanzhuan=DongliFanzhuan()
 #是否是单图测试
 if zm.connection.isTest:
     zm.stockShow()
@@ -298,9 +300,13 @@ else:
     s.statistic()
     # #回防
     zm.huiBu()
+    #动力反转
+    donglifanzhuan.donglifanzhuan()
     # # #作图
     zm.stockShow()
     # 分类股票推荐发送
     sendEmail.sendYouCanBuy(zm.currentPath)
+
+
 
 

@@ -208,13 +208,10 @@ class Application:
         return 0
 
     #补充买点
+    #补充买点
     def executeForFanzhuanDongli(self, code):
-        result = self.queryStock.queryStock(code,1)
-        if len(result[0]) < 200:
-            return self
-        type=self.parseLongli(result[0])
-        fanzhuan=result[3]
-        if type<=0.5 and type!=0 and fanzhuan>0:
+        huaerjie = self.queryStock.queryStockFantanFanZhuan(code,1)
+        if huaerjie==99:
             self.isZsm=99
             print("动力+反转:\t"+code)
         return self

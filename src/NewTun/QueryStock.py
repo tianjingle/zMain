@@ -177,6 +177,149 @@ class QueryStock:
         resultTemp.append(huaejie)
         return resultTemp
 
+
+    def queryStockFantanFanZhuan(self, stackCode, limit):
+        # 连接数据库
+        resultTemp = []
+        connection = Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset
+        )
+        # 获取游标
+        cursor = connect.cursor()
+        # 查询数据
+        sql = "select * from (SELECT DISTINCT * FROM `" + stackCode + "` where tradestatus=1 and turn is not null order by date desc limit %i) as b order by date asc"
+        data = (self.window + 80)
+        cursor.execute(sql % data)
+        fs = cursor.description
+        filelds = []
+        for field in fs:
+            filelds.append(field[0])
+        rs = cursor.fetchall()
+        result = pd.DataFrame(list(rs), columns=filelds)
+        # 关闭连接
+        cursor.close()
+        connect.close()
+        # 二维数组
+        result = result.loc[:, ['date', 'open', 'high', 'low', 'close', 'volume', 'turn', 'tradestatus']]
+        zsindex = ZSIndex()
+        # 主力线，散户线
+        mm = zsindex.convertXQH(result)
+        result['m'] = mm
+
+        result['VAR618'] = 618
+        result['VAR100'] = 100
+        result['VAR10'] = 10
+        result['VAR0'] = 0
+
+
+        #---------------------------动力-----开始
+        result['VAR_4']=4
+        # VAR2 := LLV(LOW, 10);
+        result['VAR2_dongli']=result['low'].rolling(10).min().astype(float)
+        # VAR3 := HHV(HIGH, 25);
+        result['VAR3_dongli']=result['high'].rolling(25).max().astype(float)
+        # 动力线 := EMA((CLOSE - VAR2) / (VAR3 - VAR2) * 4, 4);
+        result['CLOSE_VAR2']=result['close'].astype(float)-result['VAR2_dongli'].astype(float)
+        result['VAR3_VAR2']=result['VAR3_dongli'].astype(float)-result['VAR2_dongli'].astype(float)
+        result['CLOSE_VAR2_VAR3_VAR2X4'] = talib.DIV(result['CLOSE_VAR2'], result['VAR3_VAR2'])
+        result['dongliTTTT']=talib.MULT(result['CLOSE_VAR2_VAR3_VAR2X4'], result['VAR_4'])
+        result['DONGLILINE'] = talib.EMA(result['dongliTTTT'], 4)
+        # ---------------------------动力-----结束
+
+
+        # 主力散户吸筹
+        # VAR2:=REF(LOW,1);      前一日的最低价
+        result['VAR2'] = result['low']
+        result['VAR2'] = result['VAR2'].shift(1)
+        result = result.fillna(0)
+        result['low'] = result['low'].astype(float)
+        result['VAR2'] = result['VAR2'].astype(float)
+        result['closeP'] = result['close']
+        result['closeP'] = result['closeP'].astype(float)
+
+        # VAR3 := SMA(ABS(LOW - VAR2), 3, 1) / SMA(MAX(LOW - VAR2, 0), 3, 1) * 100;
+        result['LOW_VAR2'] = result['low'] - result['VAR2']
+        result['var3Pre'] = talib.SMA(result['LOW_VAR2'].abs(), 3)
+        result = result.assign(var3sub=np.where(result.LOW_VAR2 > 0, result.LOW_VAR2, 0.00000000000000000001))
+        result['var3sub'] = talib.SMA(result['var3sub'], 3)
+
+        result['VAR3'] = talib.MULT(talib.DIV(result['var3Pre'], result['var3sub']), result['VAR100'])
+        result = result.assign(
+            tianjingle=np.where(result.closeP * 1.3 != 0, round(result.VAR3 * 10, 2), result.VAR3 / 10))
+        result['tianjingle'] = result['tianjingle'].astype(float)
+        result['tianjingle'].fillna(0)
+        result['VAR4'] = talib.EMA(result['tianjingle'], 3)
+        # print(result['VAR4'])
+        # VAR5 := LLV(LOW, 30);
+        result['VAR5'] = result['low'].rolling(30).min()
+        # VAR6 := HHV(VAR4, 30);
+        result['VAR6'] = result['VAR4'].rolling(30).max()
+        # print(result['VAR6'])
+        # VAR7 := IF(MA(CLOSE, 58), 1, 0);
+        result['VAR7temp'] = talib.MA(result['close'], 58)
+        # 这里做判断
+        result = result.assign(VAR7=np.where(result.VAR7temp != 0, 1, 0))
+        # VAR8 := EMA(IF(LOW <= VAR5, (VAR4 + VAR6 * 2) / 2, 0), 3) / 618 * VAR7;
+        result = result.assign(VAR8TEMP=np.where(result.low <= result.VAR5, (result.VAR4 + result.VAR6 * 2) / 2, 0))
+        result['VAR8TEMP'] = talib.EMA(result['VAR8TEMP'], 3)
+        result['VAR8'] = talib.MULT(talib.DIV(result['VAR8TEMP'], result['VAR618']), result['VAR7'])
+        # print(result['VAR8'].max())
+        # print(result['VAR8'].min())
+        result['VAR8'] = result['VAR8'] / 10000000000000000000
+        # VAR9 := IF(VAR8 > 100, 100, VAR8);
+        result = result.assign(VAR9=np.where(result.VAR8 > 100, 100, result.VAR8))
+        # 输出吸筹:当满足条件VAR9>-120时,在0和VAR9位置之间画柱状线,宽度为2,5不为0则画空心柱.,画洋红色
+        # 输出地量:当满足条件0.9上穿1/成交量(手)*1000>0.01AND"KDJ的J"<0时,在最低价*1位置书写文字,COLOR00FFFF
+        # 吸筹: STICKLINE(VAR9 > -120, 0, VAR9, 2, 5), COLORMAGENTA;
+        # 地量: DRAWTEXT(CROSS(0.9, 1 / VOL * 1000 > 0.01 AND "KDJ.J" < 0), L * 1, '地量'), COLOR00FFFF;
+        result = result.assign(VARXC=np.where(result.VAR9 > limit, result.VAR9, 0))
+
+        #day 1
+        endOne = result['VAR9'][-1:].iloc[0]
+        #day 2
+        endTwo = result['VAR9'][-2:-1].iloc[0]
+        huaejie=0
+        # 当天的反转信号
+        fanzhuan = result['m'][-1:].iloc[0]
+        if fanzhuan <= 0:
+            # 第二天的反转信息
+            fanzhuan = result['m'][-2:-1].iloc[0]
+            #昨日反转，并带吸筹
+            if fanzhuan > 0 and endTwo>5:
+                huaejie = 1
+        #今日反转，并带吸筹
+        elif fanzhuan > 0 and endOne>5:
+            huaejie = 1
+
+
+        today =  result['DONGLILINE'][-1:].iloc[0]
+        yestoday = result['DONGLILINE'][-2:-1].iloc[0]
+        three = result['DONGLILINE'][-3:-2].iloc[0]
+        ttt=0
+        if huaejie==1 and today > 0.5 and yestoday <= 0.5 and yestoday>0.2 and three<=0.2:
+            ttt= 99
+
+
+
+
+        # # 当天的反转信号
+        # fanzhuan = result['m'][-1:].iloc[0]
+        # if fanzhuan <= 0:
+        #     # 第二天的反转信息
+        #     fanzhuan = result['m'][-2:-1].iloc[0]
+        #     if fanzhuan>0 and type<=0.5 and type>0:
+        #         huaejie=1
+        # elif fanzhuan>0 and type<=0.5 and type>0:
+        #     huaejie=1
+
+        return ttt
+
     def queryYouCanBuyStock(self):
 
 
@@ -543,6 +686,7 @@ class QueryStock:
         # 获取游标
         # 查询数据
         sql = "SELECT distinct * FROM `candidate_stock` where zsm>0 and collect_date in ("+temp+")"
+        sql = "SELECT distinct * FROM `candidate_stock` where zsm in (1,2,99) and collect_date in ("+temp+")"
         print(sql)
         cursor.execute(sql)
         for row in cursor.fetchall():

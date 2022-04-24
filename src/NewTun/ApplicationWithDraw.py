@@ -145,7 +145,7 @@ class ApplicationWithDraw:
 
         # 筹码计算
         resultEnd,currentPrice = self.chipCalculate(result, self.queryStock.start)
-        self.draw.chouma(resultEnd)
+        self.draw.chouma(resultEnd,currentPrice)
         currentYasuoXishu = resultEnd[len(resultEnd) - 1][8]
         self.draw.diffrentYasuoXishu=currentYasuoXishu
         resultEndLength = len(resultEnd)
