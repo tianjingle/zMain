@@ -59,7 +59,7 @@ class ChipCalculate:
                     vol = 0
                 else:
                     vol = float(line[5])
-                avc_price = float(line[6])
+                avc_price = float(line[4])
                 if line[7] == '':
                     line[7] = 0
                 if data[dataLength - i][8] == '' or data[dataLength - i][8] == None or float(
