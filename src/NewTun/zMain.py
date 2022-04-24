@@ -294,14 +294,14 @@ else:
     zm.scanStock()
     #突然觉醒
     zm.soul()
+    #动力反转
+    donglifanzhuan.donglifanzhuan()
     # # # #股票排名
     zm.sortByStockGrad()
     #统计股票盈利情况
     s.statistic()
     # #回防
     zm.huiBu()
-    #动力反转
-    donglifanzhuan.donglifanzhuan()
     # # #作图
     zm.stockShow()
     # 分类股票推荐发送
