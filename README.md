@@ -1,7 +1,7 @@
 # zMain
 
 合作交流：2695062879（请备注zMain交流）
-![所有股票入库](src/NewTun/temp/zMain1.png)
+![所有股票入库](src/NewTun/temp/center.png)
 # 设置数据库的sql_model
 ```sql
 SELECT industry,count(*) as num FROM noun.candidate_stock where zsm=2 group by industry;
