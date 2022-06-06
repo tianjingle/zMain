@@ -16,6 +16,7 @@ class Statistics:
             profit=(float(priceList[1][0])-float(priceList[0][0]))*100/float(priceList[0][0])
             #更新数据库
             query.updateCandidate(item[0],priceList[0][0],priceList[1][0],profit,priceList[1][1])
+            print(str(item)+"\t"+str(profit)+"%")
 
 
 

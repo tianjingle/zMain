@@ -1,9 +1,4 @@
 import math
-import threading
-
-import pandas as pd
-import talib
-
 from src.NewTun.ChipCalculate import ChipCalculate
 from src.NewTun.DrawPicture import DrawPicture
 from src.NewTun.LeastSquare import LeastSquare
@@ -53,6 +48,7 @@ class Application:
             temp.append(row['low'])
             # temp.append(row['close'])
             temp.append((float(row['high'])+float(row['low']))/2)
+
             temp.append(row['volume'])
             temp.append(row['tprice'])
             temp.append(row['turn'])
@@ -78,7 +74,6 @@ class Application:
         sumfx=sumfx*sumfx
         rightup=sumfx/sumF
         result=math.sqrt((sumfdoubleX-rightup)/sumF)
-        print("--方差"+str(result))
         return result
 
     #执行器
@@ -142,7 +137,6 @@ class Application:
         sanJx=resultEnd[len(resultEnd)-1][7]
         currentYasuoXishu=resultEnd[len(resultEnd)-1][8]
         self.cvValue=currentYasuoXishu
-        print(bigVolPriceLastOne)
 
         tianjingle = self.least.everyErChengPriceForArray(np.array(x), np.array(p), 30)
         x1 = []
@@ -208,7 +202,6 @@ class Application:
         return 0
 
     #补充买点
-    #补充买点
     def executeForFanzhuanDongli(self, code):
         huaerjie = self.queryStock.queryStockFantanFanZhuan(code,1)
         if huaerjie==99:
@@ -218,7 +211,7 @@ class Application:
 
     #补充买点
     def executeForBc(self, code):
-        result = self.queryStock.queryStock(code,1)
+        result = self.queryStock.queryStockBc(code,5)
         if len(result[0]) < 200:
             return self
         type=self.parseLongli(result[0])
@@ -229,13 +222,13 @@ class Application:
             print("好望角买点~")
             self.isZsm=3
         else:
-            if type<=0.5 and type!=0 and result[2]>1:
+            if type<=0.5 and type!=0 and result[2]>15:
                 inner=1
                 print("旺角动力~")
                 print(result[2])
                 self.isZsm=5
         if result[3]>0:
-            print("亚马逊买点~")
+            print("反弹买点~")
             self.isZsm=4
             if type<=0.5 and type!=0:
                 inner=1
@@ -244,8 +237,8 @@ class Application:
         if inner==0 and type<=0.5 and type!=0:
             print("纯动力~")
             self.isZsm=6
-        if type<=0.5 and type!=0 and result[2]>1 and result[3]>0:
-            print("超级+++++")
+        if type<=0.5 and type!=0 and result[2]>5 and result[3]>0:
+            print("超级+++++：动力，吸筹，反弹")
             self.isZsm = 7
         return self
 

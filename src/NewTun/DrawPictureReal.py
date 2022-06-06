@@ -105,8 +105,8 @@ class DrawPictureReal:
             #     ax1.plot(myX, myY, color="yellow", linewidth=0.3)
             for index, row in result.iterrows():
                 currentIndex = index - 0
-                XCH = row['VARXCLimit']
-                if float(XCH) > 0:
+                XCH = row['VARXC']
+                if float(XCH) > 30:
                     self.ax1.axvline(currentIndex, ls='-', c='orange', ymax=0.02, ymin=0, lw=2)
 
 
@@ -295,3 +295,8 @@ class DrawPictureReal:
             self.cmx.barh(ChoumaDowny, ChoumaDownHight, color="y", align="center", height=0.05)
             self.cmx.barh(ChoumaUpy, ChoumaUpHight, color="Turquoise", align="center", height=0.05)
             self.cmx.barh(TavcPrice, tmax, color="red", height=0.05)
+
+    def ax5ShowXc(self, ixcList, yxcList):
+        if self.isShow:
+            self.ax5.bar(ixcList, yxcList, color='#ffffcc', width=0.5, alpha=0.8)  # 画吸筹
+            pass

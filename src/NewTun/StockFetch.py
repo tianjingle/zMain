@@ -12,15 +12,22 @@ import baostock as bs
 from src.NewTun.Connection import Connection
 from src.NewTun.QueryStock import QueryStock
 from src.NewTun.ReadTdx2Db import ReadTdx2Db
+from src.NewTun.Tencent import Tencent
 
 
 class StockFetch:
 
     tdxData=None
     first=True
+    tencent=None
+    connection = Connection()
+    connectionStr = "mysql+pymysql://" + connection.user + ":" + connection.passwd + "@" + connection.host + ":" + str(
+        connection.port) + "/" + connection.db + "?charset=utf8"
+    engine = create_engine(connectionStr, pool_size=20, pool_recycle=60)
 
     def __init__(self):
         self.tdxData=ReadTdx2Db()
+        self.tencent=Tencent()
 
     # 获取股票数据
     def fetchByStartAndEndTime(self, code, startTime, endTime):
@@ -56,6 +63,38 @@ class StockFetch:
         # 插入数据库
         result.to_sql(name=code, con=engine, if_exists='append', index=False, index_label=False)
 
+    # 获取数据
+    def fetchDataFromEasyquotation(self,code,endDate):
+        # result = pd.DataFrame({'source': ["date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"]})
+        result = pd.DataFrame()
+        now = self.tencent.getCurrentStockInfo(code)
+        tradestatus=1
+        isSt=0
+        #时间对应上，则拉数据
+        if str(now['datetime']).split(" ")[0]!=endDate:
+            print("非本日数据...无法拉取")
+            return
+        if now['open']==0 and now['volume']==0:
+            tradestatus=0
+        if now['name'].__contains__("ST"):
+            isSt=1
+        # "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
+        tian = [{'date': endDate,
+                 'code':code,
+                 'open': now['open'],
+                 'high': now['high'],
+                 'low': now['low'],
+                 'close': now['now'],
+                 'volume': now['volume'],
+                 'tradestatus':tradestatus,
+                 'turn': now['turnover'],
+                 'isST':isSt}]
+        result = result.append(tian, ignore_index=True)
+        # 插入数据库
+        result.to_sql(name=code, con=self.engine, if_exists='append', index=False, index_label=False)
+
+
+
 
     def parseDataFromCvs(self,path,code, startTime, endTime):
         file=code.split(".")[1]
@@ -82,6 +121,9 @@ class StockFetch:
         cursor = connect.cursor()
         cursor.execute(sql)
         connect.commit()
+
+
+# StockFetch().fetchDataFromEasyquotation("sh.600090",'2022-05-19')
 
 
 

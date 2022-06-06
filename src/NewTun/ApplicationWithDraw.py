@@ -55,14 +55,14 @@ class ApplicationWithDraw:
         return resultEnd,currentPrice
 
     def executeForTest(self, code, savePath):
-        result = self.queryStock.queryStock(code,25)
+        result = self.queryStock.queryStockBc(code,5)
         if len(result[0]) < 200:
             return self
         return self.core(result[0], code, True, savePath, True)
 
     # 执行器
     def execute(self, code, isShow, savePath):
-        result = self.queryStock.queryStock(code,25)
+        result = self.queryStock.queryStockBc(code,5)
         if len(result[0]) < 200:
             return self
         return self.core(result[0], code, isShow, savePath, False)
@@ -171,6 +171,8 @@ class ApplicationWithDraw:
         zList = []
         sList = []
         fList = []
+        ixcList=[]
+        yxcList=[]
         zsm = {}
         for index, row in result.iterrows():
             iList.append(index - self.queryStock.start)
@@ -178,6 +180,10 @@ class ApplicationWithDraw:
             s = float(float(row['s']))
             zList.append(z)
             sList.append(s)
+            xc=float(row['VARXC'])
+            if xc>0:
+                ixcList.append(index - self.queryStock.start)
+                yxcList.append(xc)
             convert = int(row['m'])
             if convert == 1:
                 fList.append(index - self.queryStock.start)
@@ -285,6 +291,7 @@ class ApplicationWithDraw:
         # self.loopBack.testNewTon(NewtonBuySall,self.indexCloseDict)
         # self.draw.ax5Show(self.loopBack.baseRmb,self.loopBack.buysell,self.loopBack.myRmb)
         self.draw.ax5ShowZsm(zsm, fList, priceBigvolPriceIndexs, iList, zList, sList)
+        self.draw.ax5ShowXc(ixcList,yxcList)
 
         x=[]
         y=[]

@@ -1,12 +1,11 @@
 import datetime
 import time
-import threadpool
-
+import uuid
+import pendulum
 import pymysql.cursors
 from src.NewTun.Connection import Connection
 from src.NewTun.JgdyQuery import JgdyQuery
 from src.NewTun.StockFetch import StockFetch
-from src.NewTun.TDX.Core import Core
 
 
 class StockInfoSyn:
@@ -71,6 +70,7 @@ class StockInfoSyn:
         cursor = connect.cursor()
         startTime = ''
 
+        fectExecute = StockFetch()
         for row in stockTemp:
             isToady = False
             print("thread-" + str(i) +" - " + row)
@@ -98,15 +98,63 @@ class StockInfoSyn:
                 print(realCode + "--不需要同步了。。")
             else:
                 print("syn  " + realCode)
-                fectExecute = StockFetch()
                 # 优先从通达信获取数据
                 if connection.tdxDayPath == '':
-                    fectExecute.fetchByStartAndEndTime(realCode, startTime, endTime)
+                    #没有表，需要重新创建表
+                    t=pendulum.parse(endTime).day_of_week
+                    subDay=self.dayofyear(startTime, endTime)
+                    #相差一天以上，而且在周内。则先用baostock跑，再添加上腾讯当时数据
+                    if subDay>1 and t<6:
+                        fectExecute.fetchByStartAndEndTime(realCode, startTime, endTime)
+                        add_hour = datetime.datetime.now()
+                        now_hour = add_hour.strftime('%H')
+                        if int(now_hour) < 18:
+                            # 查找股票的最近时间
+                            sql = "SELECT * FROM `%s` order by date desc limit 1;"
+                            data = (realCode)
+
+                            connection = Connection()
+                            connect = pymysql.Connect(
+                                host=connection.host,
+                                port=connection.port,
+                                user=connection.user,
+                                passwd=connection.passwd,
+                                db=connection.db,
+                                charset=connection.charset
+                            )
+                            cursor = connect.cursor()
+
+                            cursor.execute(sql % data)
+                            innnerNow=False
+                            # 如果没有数据那么设置为1997年开始
+                            for row in cursor.fetchall():
+                                startTime1 = row[0]
+                                if startTime1 == endTime:
+                                    innnerNow = True
+                                break
+                            #不是当日，采用拼接的方式
+                            if innnerNow==False:
+                                fectExecute.fetchDataFromEasyquotation(realCode, endTime)
+                    elif subDay>1 and t>=6:
+                        #周末跑数据，直接走baostock
+                        fectExecute.fetchByStartAndEndTime(realCode, startTime, endTime)
+                    elif subDay==1 and t<6:
+                        #相隔一天的周内数据，直接走腾讯
+                        fectExecute.fetchDataFromEasyquotation(realCode, endTime)
                 else:
                     fectExecute.parseDataFromCvs(connection.tdxDayPath, realCode, startTime, endTime)
             if self.isJgdy == 'True':
                 jgdy = JgdyQuery()
                 jgdy.printJgdyInfo(realCode.split('.')[1], 1)
+
+    #两个时间的差
+    def dayofyear(self,startTime,endTime):
+        a=startTime.split("-")
+        b=endTime.split("-")
+        date1 = datetime.date(year=int(a[0]), month=int(a[1]), day=int(a[2]))
+        date2 = datetime.date(year=int(b[0]), month=int(b[1]), day=int(b[2]))
+        return (date2 - date1).days + 1
+
 
 
     def synStockInfo(self):
@@ -133,5 +181,35 @@ class StockInfoSyn:
         print("--------------syn---------end....")
         cursor.close()
         connect.close()
+
+    def fanzhuanTatalSyn(self):
+        # 获取游标
+        connection = Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset
+        )
+        cursor = connect.cursor()
+        tableCheckSql = "show tables like 'a_fan_zhuan_size'"
+        cursor.execute(tableCheckSql)
+        if len(list(cursor)) == 0:
+            print("no table fanzhuan... ")
+            print("create table a_fan_zhuan_size... ")
+            createTable = "create table a_fan_zhuan_size(id varchar(64) primary key not null,collect_date varchar(64),count int,other varchar(45))"
+            cursor.execute(createTable)
+        endTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        fanzhuanSql="select * from a_fan_zhuan_size where collect_date='"+endTime+"'"
+        cursor.execute(fanzhuanSql)
+        count =len(cursor.fetchall())
+        if count<=0:
+            sql = "INSERT INTO a_fan_zhuan_size (id,collect_date,count) VALUES ( '%s', '%s' ,%i)"
+            data = (uuid.uuid1(), endTime, 0)
+            cursor.execute(sql % data)
+            connect.commit()
+            print("insert into a_fan_zhuan_size :"+endTime)
 
 

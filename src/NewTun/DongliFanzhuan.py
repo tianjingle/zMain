@@ -24,16 +24,17 @@ class DongliFanzhuan:
         )
         # 获取游标
         cursor = connect.cursor()
-        print("-----------------------------scan dongli fanzhuan------------------------------------")
+        print("--------------------------start---scan dongli fanzhuan------------------------------------")
         syn = StockInfoSyn()
         basicStock = syn.getBiscicStock()
         for i in range(len(basicStock)):
             item = basicStock[i]
             test = Application()
+            print(item)
             kk = test.executeForFanzhuanDongli(basicStock[i][0])
             if kk.isZsm == 99:
                 # 插入数据
-                sql = "select * from candidate_stock where code='%s' and collect_date='%s'"
+                sql = "select * from candidate_stock where code='%s' and collect_date='%s' and zsm=99"
                 data = (item[0], today)
                 cursor.execute(sql % data)
                 if len(list(cursor)) == 0:
@@ -45,6 +46,5 @@ class DongliFanzhuan:
                     connect.commit()
             # 垃圾回收
             del kk, test
-        print("动力反转 扫描---finish...")
+        print("------------------------end-----scan dongli fanzhuan------------------------------------")
         pass
-

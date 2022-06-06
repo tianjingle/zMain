@@ -1,8 +1,9 @@
-
 import sys
 import os
 
+from src.NewTun.CacheSaver import CacheSaver
 from src.NewTun.DongliFanzhuan import DongliFanzhuan
+from src.NewTun.FqApplication import FqApplication
 from src.NewTun.TDX.Core import Core
 
 curPath=os.path.abspath(os.path.dirname(__file__))
@@ -44,7 +45,7 @@ class zMain:
         if self.connection.savePath!='':
             self.currentPath=self.connection.savePath
             if not os.path.exists(self.currentPath+"\\temp\\"):
-                os.makedirs(self.currentPath)
+                os.makedirs(self.currentPath+"\\temp\\")
         #设置一个默认的图片
         if not os.path.exists(self.currentPath+"\\temp\\zMain.png"):
             imgHeight=100
@@ -73,9 +74,12 @@ class zMain:
             if self.connection.tdxDayPath != '' and os.path.exists(self.connection.tdxDayPath):
                 core = Core()
                 core.exec()
+
             print("-----------------------------syn stock------------------------------------")
             print("start time:"+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
             syn=StockInfoSyn()
+            # 创建反转统计记录
+            syn.fanzhuanTatalSyn()
             syn.isJgdy=self.connection.isJgdy
             syn.synStockInfo()
             print("start time:"+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
@@ -105,8 +109,6 @@ class zMain:
                 print("thread-"+str(t)+"\t"+item[0]+"\t"+item[1]+"\t"+item[2]+"\t"+item[3])
             else:
                 continue
-            # if item[0]!="sz.300730":
-            #     continue
             kk = test.execute(item[0])
             if kk.isZsm==1:
                 print("thread"+str(t)+"\t--------主力、散户、反转信号出现------")
@@ -114,7 +116,7 @@ class zMain:
             elif kk.isZsm==2:
                 print("up")
 
-            if test.avgCostGrad < 0 or kk.isZsm>=1:
+            if kk.isZsm>=1:
                 candidateTemp = []
                 candidateTemp.append(item[0])
                 candidateTemp.append(item[1])
@@ -174,7 +176,6 @@ class zMain:
             stockCodeList.append(item)
 
         self.doScan(1,len(stockCodeList),stockCodeList,today,cursor,connect)
-        print("xi")
         print("-----扫描结束-----")
 
 
@@ -192,7 +193,8 @@ class zMain:
             test.executeForTest(self.connection.testCode,self.currentPath)
         else:
             todayStocks=QueryStock()
-            todays=todayStocks.todayRecentDaye(3)
+            #recentday 1
+            todays=todayStocks.todayRecentDaye(1)
             codes=todayStocks.queryStockByDate(todays)
             for item in codes:
                 test = ApplicationWithDraw()
@@ -251,10 +253,10 @@ class zMain:
             test = Application()
             kk = test.executeForBc(basicStock[i][0])
             if kk.isZsm==4:
-                print("--------亚马逊的河流------")
+                print("--------zsm=4------")
                 print(item[0]+"---"+item[1])
             if kk.isZsm==7:
-                print("超级+++++:"+basicStock[i][0])
+                print("超级+++++zsm=7:"+basicStock[i][0])
             if kk.isZsm == 3 or kk.isZsm == 4 or kk.isZsm==5 or kk.isZsm==6 or kk.isZsm==7:
                 # 插入数据
                 sql = "select * from candidate_stock where code='%s' and collect_date='%s'"
@@ -284,29 +286,34 @@ zm=zMain()
 sendEmail=SendEmail()
 s=Statistics()
 donglifanzhuan=DongliFanzhuan()
+cacher=CacheSaver()
+# cacher.save()
 #是否是单图测试
 if zm.connection.isTest:
     zm.stockShow()
 else:
-    # 同步历史数据
+    fq = FqApplication()
+    #检测复权,删除需要复权的表
+    fq.start()
+    #同步历史数据
     zm.synHistoryStock()
-    # # #扫描选股
+    #扫描选股，分水线，一鼓作气
     zm.scanStock()
-    #突然觉醒
+    #好望角等
     zm.soul()
     #动力反转
     donglifanzhuan.donglifanzhuan()
-    # # # #股票排名
+    #股票排名
     zm.sortByStockGrad()
-    #统计股票盈利情况
+    #回防
+    # zm.huiBu()
+    # #统计股票盈利情况
     s.statistic()
-    # #回防
-    zm.huiBu()
-    # # #作图
+    #缓存入库
+    cacher.save()
+    #作图
     zm.stockShow()
-    # 分类股票推荐发送
-    sendEmail.sendYouCanBuy(zm.currentPath)
-
-
+    #邮件
+    # sendEmail.sendYouCanBuy(zm.currentPath)
 
 
