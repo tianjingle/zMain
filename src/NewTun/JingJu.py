@@ -35,7 +35,7 @@ class JingJu:
                 self.list.append(line)
         #默认的警句
         if len(self.list)==0:
-            return '不劳而获是这世界上最大的坏！'
+            return '业精于勤,荒于嬉；行成于思，毁于随'
 
         fi=open(self.indexFile,"r",encoding="utf-8")
         index=fi.readlines()
