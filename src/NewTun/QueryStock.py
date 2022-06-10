@@ -1,11 +1,14 @@
 import datetime
+import json
 import time
 
 import numpy as np
+import pendulum
 import talib
 import pymysql.cursors
 import pandas as pd
 from src.NewTun.Connection import Connection
+from src.NewTun.RunTimeExecute import RunTimeExecute
 from src.NewTun.ScanFlag import ScanFlag
 from src.NewTun.ZSIndex import ZSIndex
 from src.NewTun.MyTT import *
@@ -18,9 +21,72 @@ class QueryStock:
     start=0
     isIndex=False
     scanflag=ScanFlag()
+    global runTimeExectue
+
+    def __init__(self):
+        today = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        QueryStock.runTimeExectue= RunTimeExecute()
+        if len(QueryStock.runTimeExectue.RunTimeCacheMap)==0:
+            QueryStock.runTimeExectue.readRunTime2Map(today)
+
+    def loadCache(self):
+        today = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        QueryStock.runTimeExectue= RunTimeExecute()
+        if len(QueryStock.runTimeExectue.RunTimeCacheMap)==0:
+            QueryStock.runTimeExectue.readRunTime2Map(today)
+
+
+
+    #将cache中的实时数据进行拼接
+    def doDataMerge(self,result,code):
+        markRunTimeHour=RunTimeExecute().fetchMarkRunTimeHour()
+        #周内并且盘中
+        if markRunTimeHour<15 and markRunTimeHour>=9:
+            today = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+            key=today+"_"+code
+            if QueryStock.runTimeExectue.RunTimeCacheMap.__contains__(key):
+                value=QueryStock.runTimeExectue.RunTimeCacheMap[key]
+                kkk=json.loads(value)
+                endOne = result['date'][-1:].iloc[0]
+                if endOne!=kkk['date']:
+                    result = result.append(kkk, ignore_index=True)
+            return result
+        else:
+            return result
 
     def init(self,window):
         self.window=window+80
+
+
+    def queryStockToday(self,time):
+        # 连接数据库
+        codes=[]
+        connection=Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset
+        )
+
+        cursor = connect.cursor()
+        # 查询数据
+        sql = "SELECT * FROM `candidate_stock` where collect_date='"+time+"' order by zsm desc"
+        print(sql)
+        cursor.execute(sql)
+        for row in cursor.fetchall():
+            temp=[]
+            temp.append(row[1])  #0
+            temp.append(row[2])  # 1
+            #主力、散户、反转
+            temp.append(row[12]) #5
+            codes.append(temp) #8
+        # 关闭连接
+        cursor.close()
+        connect.close()
+        return codes
 
     def queryStockBc(self, stackCode, limit):
         # 连接数据库
@@ -51,6 +117,7 @@ class QueryStock:
         connect.close()
         # 二维数组
         result = result.loc[:, ['date', 'open', 'high', 'low', 'close', 'volume', 'turn', 'tradestatus']]
+        result=self.doDataMerge(result,stackCode)
 
         # 计算三十日均线
         result['M30'] = talib.SMA(result['close'], 30)
@@ -178,7 +245,7 @@ class QueryStock:
         connect.close()
         # 二维数组
         result = result.loc[:, ['date', 'open', 'high', 'low', 'close', 'volume', 'turn', 'tradestatus']]
-
+        result=self.doDataMerge(result,stackCode)
         # 计算三十日均线
         result['M30'] = talib.SMA(result['close'], 30)
         result['T30'] = talib.T3(result['close'], timeperiod=30, vfactor=0)
@@ -358,6 +425,7 @@ class QueryStock:
         connect.close()
         # 二维数组
         result = result.loc[:, ['date', 'open', 'high', 'low', 'close', 'volume', 'turn', 'tradestatus']]
+        result=self.doDataMerge(result,stackCode)
         zsindex = ZSIndex()
         # 主力线，散户线
         mm = zsindex.convertXQH(result)
@@ -627,6 +695,14 @@ class QueryStock:
     #获取最经的交易日期
     def todayIsTrue(self):
         temp = []
+        endTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        ymd,markRunTimeHour=RunTimeExecute().fetchMarkRunTime()
+        t = pendulum.parse(endTime).day_of_week
+        # 周内并且盘中
+        if int(markRunTimeHour) < 15 and int(markRunTimeHour) >= 9 and t >= 1 and t <= 5:
+            temp.append(ymd)
+            return temp
+
         sql = "SELECT max(date) FROM `sh.600000`"
         connection = Connection()
         connect = pymysql.Connect(
@@ -855,3 +931,29 @@ class QueryStock:
         cursor.close()
         connect.close()
         return codes
+
+    def deleteStockByTime(self, endTime):
+        # 连接数据库
+        connection=Connection()
+        connect = pymysql.Connect(
+            host=connection.host,
+            port=connection.port,
+            user=connection.user,
+            passwd=connection.passwd,
+            db=connection.db,
+            charset=connection.charset
+        )
+        cursor = connect.cursor()
+        try:
+            # 查询数据
+            sql = "delete FROM candidate_stock where collect_date='"+endTime+"' and id!=''"
+            print(sql)
+            result=cursor.execute(sql)
+            print(result)
+            connect.commit()
+        except Exception as e:
+            print(e)
+            connect.rollback()
+        finally:
+            cursor.close()
+            connect.close()

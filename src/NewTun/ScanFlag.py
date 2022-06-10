@@ -8,8 +8,7 @@ class ScanFlag:
     # 板块文件地址
     stockIndex = os.path.join(os.path.dirname(__file__), "stockIndex")
     fanzhuanIndex = os.path.join(os.path.dirname(__file__), "fanzhuan")
-    # stockIndex='C:\\Users\\Administrator\\PycharmProjects\\zMain\\src\\NewTun\\stockIndex'
-    # fanzhuanIndex='C:\\Users\\Administrator\\PycharmProjects\\zMain\\src\\NewTun\\fanzhuan'
+
     baseIndex=0
 
     def readIndex(self,i,today):
@@ -25,6 +24,10 @@ class ScanFlag:
         fi = open(self.stockIndex+str(i), "w", encoding="utf-8")
         fi.write(str(today+"_"+str(nowIndex)))
         fi.close()
+
+    def resetFanzhuan(self):
+        today = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        self.writeFanzhuanIndex(today,0)
 
     #fanzhuan+1
     def addFanzhuan2File(self):

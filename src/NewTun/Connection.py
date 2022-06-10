@@ -1,9 +1,6 @@
 import configparser
 import os.path
 
-from src.NewTun.TDX.Core import Core
-
-
 class Connection:
 
     host = 'localhost'
@@ -23,6 +20,7 @@ class Connection:
     isJgdy=False
     scans=2000
     savePath=''
+    scanOnlineType="001"
 
     tdxDayPath=''
 
@@ -46,11 +44,16 @@ class Connection:
         self.charset = cf.get("Mysql-Database", "charset")  # 获取[Mysql-Database]中host对应的值
         self.syn=cf.get("System","syn")
         self.scans=cf.get("System","scans")
+        self.scanOnlineType=cf.get("System","scanOnlineType")
         self.jgdyUrl=cf.get("Jgdy","fetchUrl")
         self.isJgdy=cf.get("Jgdy","isJgdy")
         self.savePath=cf.get("Path","savePath")
         self.tdxDayPath=cf.get("Path","tdxDayPath")
 
+        if self.scanOnlineType=="001" or self.scanOnlineType=="011" or self.scanOnlineType=="010":
+            self.scanOnlineType=self.scanOnlineType
+        else:
+            self.scanOnlineType="001"
 
         testCode=cf.get('Test','testCode')
         if testCode!='':

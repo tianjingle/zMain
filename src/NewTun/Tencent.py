@@ -12,7 +12,7 @@ class Tencent:
         code=code.replace("SH","")
         code=code.replace(".","")
         b=self.quotation.real(code) # 支持直接指定前缀，如 'sh000001'
-        print(b)
+        # print(b)
         return b[code]
 
 # now=Tencent().getCurrentStockInfo("600260")

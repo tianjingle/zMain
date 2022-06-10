@@ -1,6 +1,7 @@
-import os
+import json
 import sys
 from datetime import time
+import time
 
 import pandas as pd
 import pymysql
@@ -10,8 +11,8 @@ import baostock as bs
 
 # 获取指定股票开始结束时间的股票数据
 from src.NewTun.Connection import Connection
-from src.NewTun.QueryStock import QueryStock
 from src.NewTun.ReadTdx2Db import ReadTdx2Db
+from src.NewTun.RunTimeExecute import RunTimeExecute
 from src.NewTun.Tencent import Tencent
 
 
@@ -63,6 +64,37 @@ class StockFetch:
         # 插入数据库
         result.to_sql(name=code, con=engine, if_exists='append', index=False, index_label=False)
 
+
+
+    def fetchDataFromEasyquotation2Cache(self,code,endDate):
+        now = self.tencent.getCurrentStockInfo(code)
+        tradestatus=1
+        isSt=0
+        #时间对应上，则拉数据
+        if str(now['datetime']).split(" ")[0]!=endDate:
+            print("非本日数据...无法拉取")
+            return
+        if now['open']==0 and now['volume']==0:
+            tradestatus=0
+        if now['name'].__contains__("ST"):
+            isSt=1
+
+        mark=RunTimeExecute()
+        hour=time.localtime().tm_hour
+        if int(hour) < 15 and int(hour)>=9:
+            #当日15点之前跑的数据，统一写到cache中，不写数据库
+            tianjl={'date': endDate,
+                 'code':code,
+                 'open': now['open'],
+                 'high': now['high'],
+                 'low': now['low'],
+                 'close': now['now'],
+                 'volume': now['volume'],
+                 'tradestatus':tradestatus,
+                 'turn': now['turnover'],
+                 'isST':isSt}
+            mark.writeRunTime2Cache(endDate+"_"+code+"_"+str(json.dumps(tianjl)))
+
     # 获取数据
     def fetchDataFromEasyquotation(self,code,endDate):
         # result = pd.DataFrame({'source': ["date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"]})
@@ -79,6 +111,7 @@ class StockFetch:
         if now['name'].__contains__("ST"):
             isSt=1
         # "date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,isST"
+
         tian = [{'date': endDate,
                  'code':code,
                  'open': now['open'],
@@ -89,9 +122,27 @@ class StockFetch:
                  'tradestatus':tradestatus,
                  'turn': now['turnover'],
                  'isST':isSt}]
-        result = result.append(tian, ignore_index=True)
-        # 插入数据库
-        result.to_sql(name=code, con=self.engine, if_exists='append', index=False, index_label=False)
+
+        mark=RunTimeExecute()
+        ymd,hour=mark.fetchMarkRunTime()
+        if ymd==endDate and int(hour) < 15 and int(hour)>=9:
+            #当日15点之前跑的数据，统一写到cache中，不写数据库
+            tianjl={'date': endDate,
+                 'code':code,
+                 'open': now['open'],
+                 'high': now['high'],
+                 'low': now['low'],
+                 'close': now['now'],
+                 'volume': now['volume'],
+                 'tradestatus':tradestatus,
+                 'turn': now['turnover'],
+                 'isST':isSt}
+            mark.writeRunTime2Cache(endDate+"_"+code+"_"+str(json.dumps(tianjl)))
+        else:
+            #15点之后写到数据库中
+            result = result.append(tian, ignore_index=True)
+            # 插入数据库
+            result.to_sql(name=code, con=self.engine, if_exists='append', index=False, index_label=False)
 
 
 

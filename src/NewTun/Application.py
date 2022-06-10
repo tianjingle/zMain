@@ -27,9 +27,6 @@ class Application:
     isZsm=0
 
     def setStackCode(self):
-        least=LeastSquare()
-        draw = DrawPicture()
-        loopBack = LoopBack()
         queryStock = QueryStock()
         queryStock.init(self.window)
         self.indexCloseDict={}

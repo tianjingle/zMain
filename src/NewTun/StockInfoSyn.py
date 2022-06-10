@@ -5,6 +5,7 @@ import pendulum
 import pymysql.cursors
 from src.NewTun.Connection import Connection
 from src.NewTun.JgdyQuery import JgdyQuery
+from src.NewTun.RunTimeExecute import RunTimeExecute
 from src.NewTun.StockFetch import StockFetch
 
 
@@ -71,6 +72,10 @@ class StockInfoSyn:
         startTime = ''
 
         fectExecute = StockFetch()
+
+        #开始运行的时间
+        markRunTimeHour=RunTimeExecute().fetchMarkRunTimeHour()
+
         for row in stockTemp:
             isToady = False
             print("thread-" + str(i) +" - " + row)
@@ -97,7 +102,10 @@ class StockInfoSyn:
             if isToady == True:
                 print(realCode + "--不需要同步了。。")
             else:
-                print("syn  " + realCode)
+                if markRunTimeHour < 15:
+                    print("syn "+realCode+"\t to runTimeCache")
+                else:
+                    print("syn  " + realCode+"\t to mysql")
                 # 优先从通达信获取数据
                 if connection.tdxDayPath == '':
                     #没有表，需要重新创建表

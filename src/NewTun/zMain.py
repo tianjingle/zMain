@@ -1,9 +1,14 @@
 import sys
 import os
 
+import pendulum
+
 from src.NewTun.CacheSaver import CacheSaver
 from src.NewTun.DongliFanzhuan import DongliFanzhuan
 from src.NewTun.FqApplication import FqApplication
+from src.NewTun.OnlineSelect import OnlineSelect
+from src.NewTun.RunCmd import RunCmd
+from src.NewTun.RunTimeExecute import RunTimeExecute
 from src.NewTun.TDX.Core import Core
 
 curPath=os.path.abspath(os.path.dirname(__file__))
@@ -91,18 +96,22 @@ class zMain:
     def doScan(self,t,stockLength,basicStock,today,cursor,connect):
         allStocklength=stockLength
         scanFlag=ScanFlag()
+        hour=RunTimeExecute().fetchMarkRunTimeHour()
+
         for i in range(allStocklength):
             item=basicStock[i]
             if item[1].__contains__("ST"):
                 continue
-            baseIndex=int(scanFlag.readIndex(t,today))
-            if baseIndex<=i:
-                scanFlag.writeIndex(t,today,i)
-            elif baseIndex>i:
-                print("thread"+str(t)+"\t"+item[1]+"\t已扫描...")
-                continue
-            if baseIndex==allStocklength-1:
-                scanFlag.writeIndex(t,today,0)
+            #盘后扫描
+            if hour>=15:
+                baseIndex=int(scanFlag.readIndex(t,today))
+                if baseIndex<=i:
+                    scanFlag.writeIndex(t,today,i)
+                elif baseIndex>i:
+                    print("thread"+str(t)+"\t"+item[1]+"\t已扫描...")
+                    continue
+                if baseIndex==allStocklength-1:
+                    scanFlag.writeIndex(t,today,0)
 
             test = Application()
             if item[0]!=None and item[1]!=None and item[2]!=None and item[3]!=None :
@@ -170,13 +179,14 @@ class zMain:
         allStocklength=len(basicStock)
         stockCodeList=[]
 
-        i=0
         for j in range(allStocklength):
             item = basicStock[j]
             stockCodeList.append(item)
 
         self.doScan(1,len(stockCodeList),stockCodeList,today,cursor,connect)
         print("-----扫描结束-----")
+        #盘中扫描处理
+        # OnlineSelect().write2OnlineTxt()
 
 
 
@@ -279,41 +289,77 @@ class zMain:
             del kk, test
         print("灵魂扫描---finish...")
         print("----------------------soul---end------------------------")
+        #盘中股票入缓存文件
+        OnlineSelect().write2OnlineTxt()
         pass
+
+    def donglifanzhuan(self):
+        donglifanzhuan = DongliFanzhuan()
+        donglifanzhuan.donglifanzhuan()
+        #盘中股票入缓存文件
+        OnlineSelect().write2OnlineTxt()
+
+    def markRunTime(self):
+        # 实时运行打桩
+        mark = RunTimeExecute()
+        #设置盘中选股标记
+        mark.markRunTime()
+        #清除盘中实时股票数据缓存
+        mark.clearRunTimeCache()
+        #清除已经筛选到的临时股票
+        OnlineSelect().clearOnlineTxt()
+        #每次将反转数量设置为0
+        ScanFlag().resetFanzhuan()
 
 
 zm=zMain()
 sendEmail=SendEmail()
 s=Statistics()
-donglifanzhuan=DongliFanzhuan()
 cacher=CacheSaver()
-# cacher.save()
+wMain=RunCmd()
 #是否是单图测试
 if zm.connection.isTest:
     zm.stockShow()
 else:
-    fq = FqApplication()
-    #检测复权,删除需要复权的表
-    fq.start()
-    #同步历史数据
+    #打桩
+    zm.markRunTime()
+    endTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+    markRunTimeHour = RunTimeExecute().fetchMarkRunTimeHour()
+    t = pendulum.parse(endTime).day_of_week
+    # 同步历史数据
     zm.synHistoryStock()
-    #扫描选股，分水线，一鼓作气
-    zm.scanStock()
-    #好望角等
-    zm.soul()
-    #动力反转
-    donglifanzhuan.donglifanzhuan()
-    #股票排名
-    zm.sortByStockGrad()
-    #回防
-    # zm.huiBu()
-    # #统计股票盈利情况
-    s.statistic()
-    #缓存入库
-    cacher.save()
-    #作图
-    zm.stockShow()
-    #邮件
-    # sendEmail.sendYouCanBuy(zm.currentPath)
+    # 周内盘中
+    if int(markRunTimeHour) < 15 and int(markRunTimeHour) >= 9 and t >= 1 and t <= 5:
+        # 好望角等
+        zm.soul()
+        # 动力反转
+        zm.donglifanzhuan()
+        print("\033[1;31;40m======业精于勤,荒于嬉；行成于思，毁于随======")
+        time = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        onlinePath = os.path.dirname(__file__) + "/online/" + time + "-cache.txt"
+        print("\033[1;31;40m盘中扫描已存储到文件夹:"+onlinePath)
+    else:
+        #进行复权
+        fq = FqApplication()
+        # #检测复权,删除需要复权的表
+        fq.start()
+        # 扫描选股，分水线，一鼓作气
+        zm.scanStock()
+        # 好望角等
+        zm.soul()
+        # 动力反转
+        zm.donglifanzhuan()
+        #股票排名
+        zm.sortByStockGrad()
+        #统计股票盈利情况
+        s.statistic()
+        #缓存入库
+        cacher.save()
+        #重启wMain
+        wMain.execute()
+        #作图
+        zm.stockShow()
+        #邮件
+        # sendEmail.sendYouCanBuy(zm.currentPath)
 
 

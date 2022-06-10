@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 import pandas as pd
 
@@ -9,6 +10,9 @@ from src.NewTun.LeastSquare import LeastSquare
 from src.NewTun.LoopBack import LoopBack
 from src.NewTun.QueryStock import QueryStock
 import numpy as np
+
+from src.NewTun.StockFetch import StockFetch
+
 curPath=os.path.abspath(os.path.dirname(__file__))
 rootPath=os.path.split(curPath)[0]
 sys.path.append(rootPath)
@@ -55,6 +59,11 @@ class ApplicationWithDraw:
         return resultEnd,currentPrice
 
     def executeForTest(self, code, savePath):
+        #先将实时数据拉到缓存中
+        endTime=time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        StockFetch().fetchDataFromEasyquotation2Cache(code,endTime)
+        #加载缓存
+        self.queryStock.loadCache()
         result = self.queryStock.queryStockBc(code,5)
         if len(result[0]) < 200:
             return self
