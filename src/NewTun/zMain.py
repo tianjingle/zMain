@@ -326,10 +326,11 @@ else:
     endTime = time.strftime('%Y-%m-%d', time.localtime(time.time()))
     markRunTimeHour = RunTimeExecute().fetchMarkRunTimeHour()
     t = pendulum.parse(endTime).day_of_week
-    # 同步历史数据
-    zm.synHistoryStock()
+
     # 周内盘中
     if int(markRunTimeHour) < 15 and int(markRunTimeHour) >= 9 and t >= 1 and t <= 5:
+        # 同步历史数据
+        zm.synHistoryStock()
         # 好望角等
         zm.soul()
         # 动力反转
@@ -343,6 +344,8 @@ else:
         fq = FqApplication()
         # #检测复权,删除需要复权的表
         fq.start()
+        # 同步历史数据
+        zm.synHistoryStock()
         # 扫描选股，分水线，一鼓作气
         zm.scanStock()
         # 好望角等
